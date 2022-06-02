@@ -20,7 +20,7 @@ TBD
 
 # Datasets
 
-Up to the June 2022, there are six available datasets for different types of parking lot occupancy prediction algorithms described below. 
+Up to the June 2022, there are six available datasets for parking lot occupancy prediction problem. For the future studies, we have combined them under the one format, add relevant metadata for each image and publish in this repo.
 
 TBD 
 
