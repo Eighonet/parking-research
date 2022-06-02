@@ -15,7 +15,6 @@ Vladislav Tishin, Artyom Sosedka, Anastasia Martynova, [Vadim Porvatov](https://
 In order to launch our scripts, you need to install the following packages
 ```
 TBD
-
 ```
 
 # Datasets
