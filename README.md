@@ -37,8 +37,6 @@ List of currently implemented baseline models for detection-based classification
 - FRCNN;
 - 
 
-List of currently implemented baseline models for patch-based detection:
-
 TBD
 
 # Contact us
