@@ -20,9 +20,24 @@ TBD
 
 # Datasets
 
+Up to the June 2022, there are six available datasets for different types of parking lot occupancy prediction algorithms described below. 
+
 TBD 
 
 # Experiments running
+
+List of currently implemented baseline models for patch-based classification:
+- CarNet from ;
+- VGG-16/19 from ;
+- AlexNet from ;
+- mAlexNet from ;
+- CFEN from ;
+
+List of currently implemented baseline models for detection-based classification:
+- FRCNN;
+- 
+
+List of currently implemented baseline models for patch-based detection:
 
 TBD
 
