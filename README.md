@@ -2,7 +2,7 @@
 
 Welcome to the main research repo of Parkfinder project -- here we present our intermediate results and publish the actual code regarding parking lot occupancy detection problem. 
 
-Vladislav Tishin, Artyom Sosedka, Anastasia Martynova, [Vadim Porvatov](https://www.researchgate.net/profile/Vadim-Porvatov)
+Anastasia Martynova, Vladislav Tishin, [Vadim Porvatov](https://www.researchgate.net/profile/Vadim-Porvatov)
 
 # News
 
