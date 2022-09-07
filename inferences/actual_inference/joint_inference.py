@@ -1,5 +1,8 @@
-from tool.darknet2pytorch import Darknet
-from tool.torch_utils import do_detect
+import importlib  
+Darknet = importlib.import_module("pytorch-YOLOv4.tool.darknet2pytorch.Darknet")
+do_detect = importlib.import_module("pytorch-YOLOv4.tool.torch_utils.Darknet")
+# from yolov4.tool.darknet2pytorch import Darknet
+# from yolov4.tool.torch_utils import do_detect
 import numpy as np
 import cv2
 
