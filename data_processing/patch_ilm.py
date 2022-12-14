@@ -1,9 +1,11 @@
 from tqdm import tqdm_notebook as tqdm
+import numpy as np
 import json
+import cv2
 import os
 
-def get_patch_crops_ilm():
-        
+def patch_ilm(image_dir, annot_dir, image_level_markup_json):
+    
     with open(image_level_markup_json) as json_file:
         ilm = json.load(json_file) # ilm - image level markup
         
@@ -15,17 +17,15 @@ def get_patch_crops_ilm():
     a = 0
     
     for image_path in tqdm(images):
-        if image_path.endswith('jpg'):
-
+        if image_path.split('.')[-1] == "jpg":
             annot_path = f"{annot_dir}/{image_path.split('.')[0]}.json"
             annot = json.load(open(annot_path))
-            for lot in annot["lots"]:
+            img = cv2.imread(f"{image_dir}/{image_path}")
+            for lot in annot:
                 
                 class_dir = "Busy" if lot['label'] else "Free"                
                 crop_name = f"image_{count}.jpg"
                 
-                # we use try-except because some images have no annotations or some images are absent
-
                 try:
                 
                     if class_dir == "Busy":
@@ -34,12 +34,14 @@ def get_patch_crops_ilm():
                         free_dict[crop_name] = ilm[image_path]
                 
                 except:                    
-                    print('Some lot markup is missing')                    
+                    print('Some lot markup is missing')
+                    a+=1
+                    
 
-                count += 1
-
-    # we have two files: busy and free
                 
+                count += 1
+                
+    print(a)
     with open("busy_ilm_markup.json", "w") as outfile:
         json.dump(busy_dict, outfile)
     
