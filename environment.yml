@@ -1,4 +1,4 @@
-name: parking_res_env
+name: parking_research
 channels:
   - pytorch
   - conda-forge

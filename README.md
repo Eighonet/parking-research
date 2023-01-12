@@ -166,11 +166,18 @@ To run the code you can install the requirements using the following command:
 pip install -r requirements.txt
 ```
 
+Or you can create and activate conda enviroment
+
+```bash
+conda env create -f environment.yml
+conda activate parking_research
+```
+
 We recommend to use Python version >= 3.7. We also recommend to use GPU for training and inference. Also we recommend to use torchvision >= 1.7.0 as far as some of the architectures are not implemented in the previous versions.
 
 # Baseline models
 
-All baseline models are located in the `baselines` folder. All models are implemented using PyTorch. All models are trained using the `[model_name].py` script. 
+All baseline models are located in the `baselines` folder. All models are implemented using PyTorch. You can train models using `train` files by just passing model name respectively.
 
 # Contact us
 
