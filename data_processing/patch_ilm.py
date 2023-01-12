@@ -1,5 +1,4 @@
 from tqdm import tqdm_notebook as tqdm
-import numpy as np
 import json
 import cv2
 import os

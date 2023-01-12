@@ -1,0 +1,16 @@
+name: parking_res_env
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - pip:
+    - einops==0.6.0
+    - geffnet==1.0.2
+    - pit==0.5
+    - pyyaml==6.0
+  - transformers==4.10.2
+  - pit
+  - vit_pytorch
+  - pytorch
+  - torchvision

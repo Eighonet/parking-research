@@ -4,7 +4,6 @@ import json
 import cv2
 import os
 
-
 def patch_crop(image_dir, annot_dir, patch_dir):
     images = os.listdir(image_dir)
 
