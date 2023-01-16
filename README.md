@@ -2,7 +2,7 @@
 
 Welcome to the main research repo of Parkfinder project. We present our intermediate results and publish the actual code regarding parking lot occupancy detection problem. 
 
-Anastasia Martynova, Mikhail Kuznetsov, [Vadim Porvatov](https://www.researchgate.net/profile/Vadim-Porvatov), Vladislav Tishin, [Natalia Semenova](https://www.researchgate.net/profile/Natalia-Semenova-7).
+Anastasia Martynova, [Mikhail Kuznetsov](https://github.com/mmkuznecov), [Vadim Porvatov](https://www.researchgate.net/profile/Vadim-Porvatov), Vladislav Tishin, [Natalia Semenova](https://www.researchgate.net/profile/Natalia-Semenova-7).
 
 
 # Datasets
@@ -178,6 +178,26 @@ We recommend to use Python version >= 3.7. We also recommend to use GPU for trai
 # Baseline models
 
 All baseline models are located in the `baselines` folder. All models are implemented using PyTorch. You can train models using `train` files by just passing model name respectively.
+
+# Data processing
+
+Data processing script are located in the `data_preprocessing` folder. Just run the `process_data.py` file to preprocess your dataset. You should pass the name of your dataset as an argument:
+
+```bash
+python process_data.py --dataset DATASET_NAME
+```
+
+**Important!**: you should configure following folder structure:
+
+```
+[DATASET_NAME]
+│
+└───[DATASET_NAME]
+|
+└───[DATASET_NAME]_annotation_classes
+```
+
+Strutcture of the directories are described above in the `Data` section.
 
 # Contact us
 
