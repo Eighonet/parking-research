@@ -9,7 +9,8 @@ Anastasia Martynova, [Mikhail Kuznetsov](https://github.com/mmkuznecov), [Vadim 
 
 In this section we provide the links to the datasets used in our experiments. We used the following datasets: ACPDS, ACMPS, CNRPark, PKLot and self-collected dataset SPKL.
 
-*Links for downloading the datasets will be provided soon.*
+Links to the datasets:
+- [ACPDS](https://sc.link/pN6X)
 
 Dataset structure:
 
