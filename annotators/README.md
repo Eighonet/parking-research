@@ -2,8 +2,8 @@
 
 The full cycle of parking lot annotating consists of two stages:
 
-- marking the location of parking spaces using widget A.
-- marking the status of parking spaces using widget B.
+- annotation of parking spaces using widget A.
+- labeling of parking spaces status using widget B.
 
 ## Widget A usage
 
