@@ -11,6 +11,10 @@ In this section we provide the links to the datasets used in our experiments. We
 
 Links to the datasets:
 - [ACPDS](https://sc.link/pN6X)
+- [ACMPS](https://sc.link/AB77)
+- [PKLot](https://sc.link/BD72)
+- [CNRPark](https://sc.link/DG7A)
+- [SPKLv2](https://sc.link/EJ7m)
 
 Dataset structure:
 
