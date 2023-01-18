@@ -2,7 +2,7 @@
 
 Welcome to the main research repo of Parkfinder project -- here we present our intermediate results and publish the actual code regarding parking lot occupancy detection problem. 
 
-*Anonymous placeholder for the authors list*
+Anastasia Martynova, [Mikhail Kuznetsov](https://github.com/mmkuznecov), [Vadim Porvatov](https://www.researchgate.net/profile/Vadim-Porvatov), Vladislav Tishin, [Natalia Semenova](https://www.researchgate.net/profile/Natalia-Semenova-7).
 
 # Prerequisites
 
