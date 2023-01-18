@@ -1,14 +1,14 @@
-# Инструкции к разметке
+# Annotation instructions
 
-Полный цикл разметки парковочных мест состоит из двух этапов:
+The full cycle of parking lot annotating consists of two stages:
 
-- разметка расположения парковочных мест посредством виджета A.
-- разметка статуса парковочных мест посредством виджета B.
+- annotation of parking spaces using widget A.
+- labeling of parking spaces status using widget B.
 
-## Использование виджета A
+## Widget A usage
 
-В одной директории с виджетом создается папка parking_photos в которой хранится по одному изображению для каждого ракурса камеры (при этом название изображения соответствует названию папки с ракурсом, например "cam_1.jpg" для папки "cam_1"). После запуска .ipynb пользователь отмечает на каждом изображении парковочные места посредством инструмента "Кисть" (полный функционал виджета проиллюстрирован [в данном видео](https://drive.google.com/file/d/1YBV01vzFHIfsJ6lkjICdrCTEHLMahpNo/view?usp=sharing)). После завершения разметки пользователь сохраняет разметку посредством соответствующий кнопки -- сохраняется файл annotations.json.
+In the same directory with the widget, a potential user should create parking_photos folder with one image per each point of view (the name of images correspond to the name of the folders with the point of view, e.g. "cam_1.jpg" for the folder "cam_1"). After launching .ipynb, the user marks parking spaces on each image with the help of the "Brush" tool (the full functionality of the widget is illustrated [in this video](https://drive.google.com/file/d/1YBV01vzFHIfsJ6lkjICdrCTEHLMahpNo/view?usp=sharing)).
 
-## Использование виджета B
+## Widget B usage
 
-В одной директории с виджетом помещаются файл "annotations.json" (полученный после сохранения результатов работы виджета A) и папки со сгруппированными относительно ракурсов изображениями. После запуска .ipynb пользователь отмечает на каждом изображении занятые (красные) и свободные (синие) парковочные места (функционал виджета проиллюстрирован [в данном видео](https://drive.google.com/file/d/12plriorxmw5o1Y9IhHOKey1IUUKSY1sx/view?usp=sharing)). После завершения разметки каждого изображения в каждой папке пользователь сохраняет разметку посредством соответствующий кнопки -- создаются директории patch_markup и int_markup с .json файлами для каждого изображения.
+In the same directory with the widget, the "annotations.json" file (obtained after saving the results of widget A) and folders with images grouped relative to angles are placed. After launching .ipynb, the user marks occupied (red) and free (blue) parking lots on each image (the functionality of the widget is illustrated [in this video](https://drive.google.com/file/d/12plriorxmw5o1Y9IhHOKey1IUUKSY1sx/view?usp= sharing)). When the annotation process is will be done, a user can save results in automatically created patch_markup and int_markup directories as the separate .json files for each image.
