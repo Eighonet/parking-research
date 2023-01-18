@@ -1,9 +1,14 @@
-# A comprehensive study on parking lot occupancy detection problem
+# Revising deep learning methods in parking lot occupancy detection
 
-Welcome to the main research repo of Parkfinder project. We present our intermediate results and publish the actual code regarding parking lot occupancy detection problem. 
+Welcome to the main research repo of the 'Revising deep learning methods in parking lot occupancy detection' paper. Here we published the actual code regarding parking lot occupancy detection problem considered in our study. 
 
+<!---
 Anastasia Martynova, [Mikhail Kuznetsov](https://github.com/mmkuznecov), [Vadim Porvatov](https://www.researchgate.net/profile/Vadim-Porvatov), Vladislav Tishin, [Natalia Semenova](https://www.researchgate.net/profile/Natalia-Semenova-7).
+--> 
 
+*anonymization placeholder for the list of authors*
+
+arXiv PDF: to be added
 
 # Datasets
 
@@ -211,3 +216,10 @@ If you have some questions about the code, you are welcome to open an issue or s
 # License
 
 Established code released as open-source software under the MIT license.
+
+# Citation
+
+To be updated.
+
+```
+```
