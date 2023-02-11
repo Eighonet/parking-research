@@ -1,6 +1,6 @@
 # Revising deep learning methods in parking lot occupancy detection
 
-Welcome to the main research repo of the 'Revising deep learning methods in parking lot occupancy detection' paper. Here we published the actual code regarding parking lot occupancy detection problem considered in our study. 
+Welcome to the research repo of the *''Revising deep learning methods in parking lot occupancy detection''* paper. Here we published the actual code regarding the parking lot occupancy detection problem considered in our study. 
 
 <!---
 Anastasia Martynova, [Mikhail Kuznetsov](https://github.com/mmkuznecov), [Vadim Porvatov](https://www.researchgate.net/profile/Vadim-Porvatov), Vladislav Tishin, [Natalia Semenova](https://www.researchgate.net/profile/Natalia-Semenova-7).
@@ -12,7 +12,7 @@ arXiv PDF: to be added
 
 # Datasets
 
-In this section we provide the links to the datasets used in our experiments. We used the following datasets: ACPDS, ACMPS, CNRPark, PKLot and self-collected dataset SPKL.
+In this section, we introduce the processed versions of datasets used in our experiments: ACPDS, ACMPS, CNRPark, PKLot and SPKL.
 
 Links to the datasets:
 - [ACPDS](https://sc.link/pN6X)
@@ -84,9 +84,7 @@ free_ilm_markup.json
 [DATASET_NAME]_dataframe.csv
 ```
 
-In processed datasets we also provide image-level markup of parking lots. Image-level markup of parking lots describes if there is some kind of real-world occlusion on the image.
-
-Overall we markup of 12 types image-level classes:
+For each of the datasets, we also provided visual condition labels describing the presence of the special effects in the images:
 
 - `Sunny` - sunny weather;
 - `Overcast` - overcast weather;
@@ -98,10 +96,9 @@ Overall we markup of 12 types image-level classes:
 - `Infrared` - infrared image;
 - `Occlusion (car)` - cars overlap each other;
 - `Occlusion (tree)` - trees overlap cars and parking lots;
-- `Distortion` - parking lot is distorted or its image made by a camera with a wide angle;
-- `Shadow` - shadow on the image, parking lot is not so visible.
+- `Distortion` - parking lot is distorted or the image recorded by a camera with a wide angle.
 
-Image-level markup auxiliary dataset strutcture:
+Image-level annotations have the following structure:
 
 ```
 [DATASET_NAME]_annotation_classes
@@ -124,21 +121,29 @@ Image-level markup auxiliary dataset strutcture:
 ...
 ```
 
-`images` folder contains the images of parking lots. `int_markup` folder contains the intersection-level markup of parking lots. `patch_markup` folder contains the patch-level markup of parking lots. `patch_splitted` folder contains the splitted patches of parking lots. `splitted_images` folder contains the splitted images of parking lots. `DATASET_NAME_image_level_markup.json` file contains the image-level markup of parking lots. `busy_ilm_markup.json` and `free_ilm_markup.json` files contain the image-level markup of busy and free parking lots.
+Overall, each dataset's structure can be described as follows:
+
+- `images` folder contains the images of parking lots;
+- `int_markup` folder contains the intersection-level annotations of parking lots; 
+- `patch_markup` folder contains the patch-level annotations of parking lots;
+- `patch_splitted` folder contains the split patches of parking lots;
+- `splitted_images` folder contains the split images of parking lots; 
+- `DATASET_NAME_image_level_markup.json` file contains the image-level annotations of parking lots; 
+- `busy_ilm_markup.json` and `free_ilm_markup.json` files contain the image-level annotations of free and occupied parking lots.
 
 # Custom dataset
 
 All scripts for data preprocessing are located in the `data_preprocessing` folder.
 
-To preprocess your own dataset you need to create a folder with the name of your dataset and put the images of parking lots in the `images` folder. After that you shoud label your dataset, using the widgets from `annotators` folder, instructions for them are located in the `annotators` folder too.
+To preprocess your own dataset, you need to create a folder with the name of your dataset and put the images of parking lots in the `images` folder. After that, you should perform the labelling procedure using the widgets from the `annotators` folder. 
 
 # Experiments running
 
-In this research we propose two approaches to solve the parking lot occupancy detection problem: patch-based classification and intersection-based classification.
+In this study, we explored two approaches to the parking lot occupancy detection problem: patch-based classification and intersection-based classification.
 
 List of implemented baseline models for patch-based classification:
 
-Convolution-based models:
+CNN models:
 
 - ResNet50;
 - MobileNet;
@@ -147,57 +152,57 @@ Convolution-based models:
 - mAlexNet;
 - VGG-16;
 - VGG-19;
-- CFEN;
+- CFEN.
 
-Transformer-based models:
+Vision transformer models:
 
 - ViT (no prt);
 - ViT (prt);
 - DeiT (prt);
 - PiT (prt);
-- ViT (SPT LSA);
+- ViT (SPT LSA).
 
-List of implemented baseline models for detection-based classification:
+List of implemented baseline models for intersection-based classification:
 
 - Faster R-CNN with ResNet-50 backbone;
 - Faster R-CNN with MobileNet backbone;
 - Faster R-CNN with VGG-19 backbone;
 - RetinaNet with ResNet-50 backbone;
 - RetinaNet with MobileNet backbone;
-- RetinaNet with VGG-19 backbone;
+- RetinaNet with VGG-19 backbone.
 
-All experiments were run on NVIDIA Tesla V100 GPUs.
+All experiments were conducted on NVIDIA Tesla V100 GPUs.
 
 # Prerequisites
 
-To run the code you can install the requirements using the following command:
+To run the code, you need to install the requirements using the following command:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Or you can create and activate conda enviroment
+Alternatively, you can create and activate the conda enviroment:
 
 ```bash
 conda env create -f environment.yml
 conda activate parking_research
 ```
 
-We recommend to use Python version >= 3.7. We also recommend to use GPU for training and inference. Also we recommend to use torchvision >= 1.7.0 as far as some of the architectures are not implemented in the previous versions.
+We recommend using Python >= 3.7 and torchvision >= 1.7.0 as far as some of the architectures are not implemented in the previous versions.
 
 # Baseline models
 
-All baseline models are located in the `baselines` folder. All models are implemented using PyTorch. You can train models using `train` files by just passing model name respectively.
+All baseline models are located in the `baselines` folder. All models are implemented using PyTorch and can be trained with the help of `train` files by passing the model name.
 
 # Data processing
 
-Data processing script are located in the `data_preprocessing` folder. Just run the `process_data.py` file to preprocess your dataset. You should pass the name of your dataset as an argument:
+The data processing script `process_data.py` is located in the `data_preprocessing` folder. You should pass the name of your dataset as an argument:
 
 ```bash
 python process_data.py --dataset DATASET_NAME
 ```
 
-**Important!**: you should configure following folder structure:
+**Important!**: you should configure the following folder structure:
 
 ```
 [DATASET_NAME]
@@ -207,7 +212,7 @@ python process_data.py --dataset DATASET_NAME
 └───[DATASET_NAME]_annotation_classes
 ```
 
-Strutcture of the directories are described above in the `Data` section.
+The structure of the included directories is described above in the `Data` section.
 
 # Contact us
 
