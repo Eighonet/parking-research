@@ -227,4 +227,12 @@ Established code released as open-source software under the MIT license.
 To be updated.
 
 ```
+@misc{martynova2023revising,
+      title={Revising deep learning methods in parking lot occupancy detection}, 
+      author={Anastasia Martynova and Mikhail Kuznetsov and Vadim Porvatov and Vladislav Tishin and Andrey Kuznetsov and Natalia Semenova and Ksenia Kuznetsova},
+      year={2023},
+      eprint={2306.04288},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG}
+}
 ```
