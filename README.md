@@ -2,13 +2,9 @@
 
 Welcome to the research repo of the *''Revising deep learning methods in parking lot occupancy detection''* paper. Here we published the actual code regarding the parking lot occupancy detection problem considered in our study. 
 
-<!---
 Anastasia Martynova, [Mikhail Kuznetsov](https://github.com/mmkuznecov), [Vadim Porvatov](https://www.researchgate.net/profile/Vadim-Porvatov), Vladislav Tishin, [Natalia Semenova](https://www.researchgate.net/profile/Natalia-Semenova-7).
---> 
 
-*anonymization placeholder for the list of authors*
-
-arXiv PDF: to be added
+arXiv PDF: https://arxiv.org/abs/2306.04288
 
 # Datasets
 
