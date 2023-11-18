@@ -31,10 +31,15 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
 
                 self.xdata.append(x)
                 self.ydata.append(y)
-                line = Line2D([self.xdata[-2], self.xdata[-1]], [self.ydata[-2], self.ydata[-1]])
+                #If first click then dont't draw anything and just save cords
+                try:
+                    line = Line2D([self.xdata[-2], self.xdata[-1]], [self.ydata[-2], self.ydata[-1]])
+                except:
+                    return
                 line.set_color('r')
                 self.axes.add_line(line)
 
+                #When clicking forth time, finish poly and clear cords
                 if len(self.xdata) % 4 == 0:
                     self.annotation_dict[self.image].append([self.xdata.copy(), self.ydata.copy()])
                     self.xdata.append(self.xdata[-4])
@@ -46,7 +51,16 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
                     plt.draw()
 
                     self.xdata, self.ydata = [], []
-
+    
+    #Returns image
+    def load_image(path):
+        img = cv2.imread(markup_dir + '/' + path.value)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        if path.value not in metadata:
+            metadata[path.value] = img.shape
+        return img
+    
+    #Shows next image
     def forward_button_clicked(b):
         if 0 <= int(selected_image.value) < len(images) - 1:
             selected_image.value = str(int(selected_image.value) + 1)
@@ -60,11 +74,9 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
             axes.clear()
             annotator.xdata, annotator.ydata = [], []
             for i in range(len(annotator.axes.lines)):
-                annotator.axes.lines.pop(0)
-            img = cv2.imread(markup_dir + '/' + path.value)
-            if path.value not in metadata:
-                metadata[path.value] = img.shape
+                annotator.axes.lines[0].remove()
                 
+            img = load_image(path)
             axes.imshow(img)
             plt.axis("off")
 
@@ -80,6 +92,7 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
                     line.set_color('r')
                     annotator.axes.add_line(line)
 
+    #Shows previous image
     def backward_button_clicked(b):
         if 1 <= int(selected_image.value) < len(images):
             selected_image.value = str(int(selected_image.value) - 1)
@@ -94,10 +107,8 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
             annotator.xdata, annotator.ydata = [], []
             for i in range(len(annotator.axes.lines)):
                 annotator.axes.lines.pop(0)
-            img = cv2.imread(markup_dir + '/' + path.value)
-            if path.value not in metadata:
-                metadata[path.value] = img.shape
-            
+                
+            img = load_image(path)
             axes.imshow(img)
             plt.axis("off")
 
@@ -112,7 +123,8 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
                     line = Line2D([xdata[j-1], xdata[j]], [ydata[j-1], ydata[j]])
                     line.set_color('r')
                     annotator.axes.add_line(line)
-                    
+    
+    #Enables label painting with am annotation_flag
     def paint_button_clicked(b):
         if annotatation_flag.value == '0':
             annotatation_flag.value = '1'
@@ -121,20 +133,19 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
             annotatation_flag.value = '0'
             button_paint.style = {'button_color': '#eeeeee'}
 
+    #Removes last drawn line or square
     def trash_button_clicked(b):
         annotator.xdata, annotator.ydata = [], []
-        img = cv2.imread(markup_dir + '/' + path.value)
-        if path.value not in metadata:
-            metadata[path.value] = img.shape
+        img = load_image(path)
             
         if len(annotator.axes.lines) > 0:
             if len(annotator.axes.lines) % 4 == 0:
                 annotator.annotation_dict[annotator.image].pop(-1)
                 for i in range(4):
-                    annotator.axes.lines.pop(-1)
+                    annotator.axes.lines[-1].remove()
             else:
                 while(len(annotator.axes.lines) % 4 != 0):
-                    annotator.axes.lines.pop(-1)
+                    annotator.axes.lines[-1].remove()
             axes.imshow(img)
 
     def download_button_clicked(b):    
@@ -155,10 +166,8 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
             axes.clear()
             annotator.xdata, annotator.ydata = [], []
             for i in range(len(annotator.axes.lines)):
-                annotator.axes.lines.pop(0)
-            img = cv2.imread(markup_dir + '/' + path.value)
-            if path.value not in metadata:
-                metadata[path.value] = img.shape
+                annotator.axes.lines.lines[0].remove()
+            img = load_image(path)
             
             axes.imshow(img)
             plt.axis("off")
@@ -175,6 +184,7 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
                     annotator.axes.add_line(line)
                
     images = [f for f in listdir(markup_dir) if isfile(join(markup_dir, f)) and f[-4:] == ".jpg"]
+    images = sorted(images)
     images_dict = {images[i]:i for i in range(len(images))}
     metadata = dict()
 
@@ -183,11 +193,9 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
 
     annotatation_flag = widgets.Label(value='0')
 
-    img = cv2.imread(markup_dir + '/' + path.value)
-    if path.value not in metadata:
-        metadata[path.value] = img.shape 
+    img = load_image(path)
         
-    fig, axes = plt.subplots(figsize=(6, 6), num='Markup widget rev1')
+    fig, axes = plt.subplots(figsize=[10,10], num='Markup widget rev2')
     axes.imshow(img)
     plt.axis("off")
 
@@ -197,11 +205,11 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
     plt.connect('button_press_event', annotator.mouse_click)
 
     button_paint = widgets.Button(description="🖌", style={'button_color': '#eeeeee'}, layout={'width': '35px'})
-    button_trash = widgets.Button(description="🗑", layout={'width': '35px'})
-    button_download = widgets.Button(description="⭳", layout={'width': '40px'})
+    button_trash = widgets.Button(description="Delete", layout={'width': '60px'})
+    button_download = widgets.Button(description="Save", layout={'width': '60px'})
 
-    button_forward = widgets.Button(description="🠖", layout={'width': '35px'})
-    button_backward = widgets.Button(description="🠔", layout={'width': '35px'})
+    button_forward = widgets.Button(description="->", layout={'width': '35px'})
+    button_backward = widgets.Button(description="<-", layout={'width': '35px'})
     dropdown = Dropdown(options=images)
     dropdown_block = Box([Label(value='Select image'), dropdown])
 
