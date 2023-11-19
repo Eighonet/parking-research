@@ -22,6 +22,7 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
             
             self.annotation_dict = dict()
             self.image = ""
+            self.img = []
 
         def mouse_click(self, event):
             if not event.inaxes:
@@ -76,8 +77,8 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
             for i in range(len(annotator.axes.lines)):
                 annotator.axes.lines[0].remove()
                 
-            img = load_image(path)
-            axes.imshow(img)
+            annotator.img = load_image(path)
+            axes.imshow(annotator.img)
             plt.axis("off")
 
             shapes = annotator.annotation_dict[path.value]
@@ -106,10 +107,10 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
             axes.clear()
             annotator.xdata, annotator.ydata = [], []
             for i in range(len(annotator.axes.lines)):
-                annotator.axes.lines.pop(0)
+                annotator.axes.lines[0].remove()
                 
-            img = load_image(path)
-            axes.imshow(img)
+            annotator.img = load_image(path)
+            axes.imshow(annotator.img)
             plt.axis("off")
 
             shapes = annotator.annotation_dict[path.value]
@@ -136,7 +137,6 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
     #Removes last drawn line or square
     def trash_button_clicked(b):
         annotator.xdata, annotator.ydata = [], []
-        img = load_image(path)
             
         if len(annotator.axes.lines) > 0:
             if len(annotator.axes.lines) % 4 == 0:
@@ -146,7 +146,7 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
             else:
                 while(len(annotator.axes.lines) % 4 != 0):
                     annotator.axes.lines[-1].remove()
-            axes.imshow(img)
+            axes.imshow(annotator.img)
 
     def download_button_clicked(b):    
         with open(output_dir + "annotations.json", "w") as outfile:
@@ -167,9 +167,9 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
             annotator.xdata, annotator.ydata = [], []
             for i in range(len(annotator.axes.lines)):
                 annotator.axes.lines.lines[0].remove()
-            img = load_image(path)
+            annotator.img = load_image(path)
             
-            axes.imshow(img)
+            axes.imshow(annotator.img)
             plt.axis("off")
             shapes = annotator.annotation_dict[path.value]
             xdata, ydata = [], []
@@ -182,6 +182,7 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
                     line = Line2D([xdata[j-1], xdata[j]], [ydata[j-1], ydata[j]])
                     line.set_color('r')
                     annotator.axes.add_line(line)
+    
                
     images = [f for f in listdir(markup_dir) if isfile(join(markup_dir, f)) and f[-4:] == ".jpg"]
     images = sorted(images)
