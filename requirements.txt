@@ -8,3 +8,7 @@ torchvision
 vit-pytorch
 matplotlib
 ipywidgets
+opencv-python
+ipympl
+ipyevents
+pandas
