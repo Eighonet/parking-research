@@ -27,32 +27,32 @@ colors = {1: (0, 0, 255), 0: (255, 0, 0)}
 thickness = 4
 isClosed = True
 
-def pm_widget(annotation_path: str="annotations.json", output_dir:str=""):
+def pm_widget(annotation_path: str="annotations.json", image_dirs : str = "img", output_dir:str=""):
     class Annotator(object):
         def __init__(self):
+            #Loading annotations from dict to touple cords
             def to_tuple(markup: list) -> list:
                 for i in range(len(markup)):
                     markup[i] = (tuple(markup[i][0]),tuple(markup[i][1]))
                 return markup
             
+            #Opening JSON reading and loadig into dict markup
             with open(annotation_path) as f:
-                self.markup = json.loads(f.read())
-            folders = sorted(list(self.markup.keys()))
+                self.markup = json.load(f)
+                 
+            img_dict_names = sorted(list(self.markup.keys()))
             self.labels = {}
-            for i in range(len(folders)):
-                data = to_tuple(self.markup[folders[i]])
-                files = [file for file in listdir(folders[i][:-4])]
-                self.labels[folders[i]] = {file:{data[j]:1 for j in range(len(data))} for file in files}
-            self.current_folder = folders[0]
-            self.current_image = [file for file in listdir(folders[0][:-4])][0]
-    annotator = Annotator()
+            for i in img_dict_names:
+                data = to_tuple(self.markup[i])
+            self.labels = {file:{data[j]:1 for j in range(len(data))} for file in img_dict_names}
+            self.current_image = img_dict_names[0]
             
     def get_image(path: str) -> bytes:
         with open(path, 'rb') as f:
             return f.read()
 
     def draw_lines(byte_image: bytes) -> bytes:
-        current_markup = annotator.labels[annotator.current_folder][annotator.current_image]
+        current_markup = annotator.labels[annotator.current_image]
         decoded = cv2.imdecode(np.frombuffer(byte_image, np.uint8), -1)
         for coords in current_markup:
             lot_markup = np.array(coords).T.astype("int")
@@ -60,25 +60,26 @@ def pm_widget(annotation_path: str="annotations.json", output_dir:str=""):
             cv2.polylines(decoded, [lot_markup], isClosed, color, thickness=thickness)
         decoded_bytes = cv2.imencode('.jpg', decoded)[1].tobytes()
         return decoded_bytes
-                        
-    def on_change(change) -> None:
-        if change["type"] == "change" and change["name"] == "value":
-            annotator.current_folder = str(change["new"]) + ".jpg"
-            annotator.current_image = [file for file in listdir(str(change["new"]))][0]
-            selected_folder.value = str(change["new"])
+    
+    # Was for changing folder useless now          
+    # def on_change(change) -> None:
+    #     if change["type"] == "change" and change["name"] == "value":
+    #         annotator.current_folder = str(change["new"]) + ".jpg"
+    #         annotator.current_image = [file for file in listdir(str(change["new"]))][0]
+    #         selected_folder.value = str(change["new"])
             
-            corresponding_images.value = str([f for f in listdir(str(change["new"])) if f[0] != "."])
-            processed_names = process_list(corresponding_images.value)
-            image_dropdown.options = processed_names
+    #         corresponding_images.value = str([f for f in listdir(str(change["new"])) if f[0] != "."])
+    #         processed_names = process_list(corresponding_images.value)
+    #         image_dropdown.options = processed_names
             
-            byte_image = get_image(selected_folder.value + "/" + processed_names[0])    
-            image.value = draw_lines(byte_image)
+    #         byte_image = get_image(selected_folder.value + "/" + processed_names[0])    
+    #         image.value = draw_lines(byte_image)
             
             
     def on_change_image(change) -> None:
         if change["type"] == "change" and change["name"] == "value":
             annotator.current_image = str(change["new"])
-            byte_image = get_image(selected_folder.value + "/" + str(change["new"]))
+            byte_image = get_image(image_dirs + "/" + str(change["new"]))
             image.value = draw_lines(byte_image)
 
     def download_button_clicked(b, output_dir:str=""):
@@ -119,14 +120,14 @@ def pm_widget(annotation_path: str="annotations.json", output_dir:str=""):
 
     def update_coords(event):
         coordinates.value = str([event['dataX'], event['dataY']])
-        current_markup = annotator.labels[annotator.current_folder][annotator.current_image]
+        current_markup = annotator.labels[annotator.current_image]
         for coords in current_markup:
             points = np.array(coords).T.astype("int")
             check = cv2.pointPolygonTest(points, (event['dataX'], event['dataY']), False)
             if check == 1:
-                annotator.labels[annotator.current_folder][annotator.current_image][coords] =\
-                int(not annotator.labels[annotator.current_folder][annotator.current_image][coords])
-        byte_image = get_image(selected_folder.value + "/" + annotator.current_image)
+                annotator.labels[annotator.current_image][coords] =\
+                int(not annotator.labels[annotator.current_image][coords])
+        byte_image = get_image(image_dirs + "/" + annotator.current_image)
         image.value = draw_lines(byte_image)
 
     def forward_button_clicked(b):
@@ -136,7 +137,7 @@ def pm_widget(annotation_path: str="annotations.json", output_dir:str=""):
         if idx < len(files) - 1:
             image_dropdown.value = files[idx+1]
             annotator.current_image = files[idx+1]
-            byte_image = get_image(selected_folder.value + "/" + str(files[idx+1]))
+            byte_image = get_image(image_dirs + "/" + str(files[idx+1]))
             image.value = draw_lines(byte_image)
 
 
@@ -147,30 +148,26 @@ def pm_widget(annotation_path: str="annotations.json", output_dir:str=""):
         if idx > 0:
             image_dropdown.value = files[idx-1]
             annotator.current_image = files[idx-1]
-            byte_image = get_image(selected_folder.value + "/" + str(files[idx-1]))
+            byte_image = get_image(image_dirs.value + "/" + str(files[idx-1]))
             image.value = draw_lines(byte_image)
 
 
-    cameras_folders = [f for f in listdir(".") if not isfile(f) and f[0] != "."]
-
+    annotator = Annotator()
+    
     # dropdowns
-    folders_dropdown = widgets.Dropdown(options=cameras_folders)
-    selected_folder = widgets.Label(value=str(cameras_folders[0]))
-
-    corresponding_images = widgets.Label(value=str([f for f in listdir(selected_folder.value) if f[0] != "."]))
+    corresponding_images = widgets.Label(value=str([f for f in listdir(image_dirs) if f[0] != "."]))
     processed_names = process_list(corresponding_images.value)
     image_dropdown = widgets.Dropdown(options=processed_names)
 
     #buttons
-    button_forward = widgets.Button(description="->", layout={"width": "35px"})
-    button_backward = widgets.Button(description="<-", layout={"width": "35px"})
+    button_forward = widgets.Button(description="→", layout={"width": "35px"})
+    button_backward = widgets.Button(description="←", layout={"width": "35px"})
     button_download = widgets.Button(description="Save", layout={"width": "60px"})
 
     coordinates = HTML('[]')
 
     # image block init
-    annotator.current_folder = selected_folder.value + ".jpg"
-    byte_image = get_image(selected_folder.value + "/" + processed_names[0])
+    byte_image = get_image(image_dirs + "/" + processed_names[0])
     image = widgets.Image(
     value=draw_lines(byte_image),
     format='jpg'
@@ -180,15 +177,14 @@ def pm_widget(annotation_path: str="annotations.json", output_dir:str=""):
     tab_nest = widgets.Tab()
 
     # control panel
-    panel = HBox([folders_dropdown, image_dropdown, button_backward, button_forward, button_download])
+    panel = HBox([image_dropdown, button_backward, button_forward, button_download])
 
     # tab filled
     tab_nest.children = [VBox(children = (image, panel))]
 
-    tab_nest.set_title(0, 'Markup widget v2')
+    tab_nest.set_title(0, 'Markup widget v2.1_Argon')
 
     # handlers
-    folders_dropdown.observe(on_change)
     image_dropdown.observe(on_change_image)
 
     im_events = Event()

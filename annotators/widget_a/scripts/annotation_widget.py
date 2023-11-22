@@ -3,6 +3,7 @@ from os.path import isfile, join
 import json
 
 import cv2
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 
@@ -203,14 +204,14 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
     annotator = Annotator(axes)
     annotator.annotation_dict[path.value], annotator.image = [], path.value
 
-    plt.connect('button_press_event', annotator.mouse_click)
+    fig.canvas.mpl_connect('button_press_event', annotator.mouse_click)
 
-    button_paint = widgets.Button(description="🖌", style={'button_color': '#eeeeee'}, layout={'width': '35px'})
+    button_paint = widgets.Button(description="Annotate", style={'button_color': '#eeeeee'}, layout={'width': '80px'})
     button_trash = widgets.Button(description="Delete", layout={'width': '60px'})
     button_download = widgets.Button(description="Save", layout={'width': '60px'})
 
-    button_forward = widgets.Button(description="->", layout={'width': '35px'})
-    button_backward = widgets.Button(description="<-", layout={'width': '35px'})
+    button_forward = widgets.Button(description="→", layout={'width': '35px'})
+    button_backward = widgets.Button(description="←", layout={'width': '35px'})
     dropdown = Dropdown(options=images)
     dropdown_block = Box([Label(value='Select image'), dropdown])
 
