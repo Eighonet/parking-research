@@ -182,7 +182,7 @@ def pm_widget(annotation_path: str="annotations.json", image_dirs : str = "img",
     # tab filled
     tab_nest.children = [VBox(children = (image, panel))]
 
-    tab_nest.set_title(0, 'Markup widget v2.1_Argon')
+    tab_nest.set_title(0, 'Markup v2.1')
 
     # handlers
     image_dropdown.observe(on_change_image)
