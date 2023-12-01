@@ -12,3 +12,5 @@ opencv-python
 ipympl
 ipyevents
 pandas
+albumentations
+common_utils
