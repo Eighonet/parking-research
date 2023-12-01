@@ -91,8 +91,7 @@ def pm_widget(annotation_path: str="annotations.json", image_dirs : str = "img",
             pass
         
         for folder in annotator.labels.keys():
-            for image in annotator.labels[folder]:
-                current_markup = annotator.labels[folder][image]
+                current_markup = annotator.labels[folder]
                 image_rois = current_markup
                 
                 standard_output = {"lots":[]}
@@ -109,10 +108,10 @@ def pm_widget(annotation_path: str="annotations.json", image_dirs : str = "img",
                     standard_output["lots"].append(lot)
                     patch_output["lots"].append(lot_patch)
 
-                with open(output_dir + "int_markup/" +  image[:-4] + '.json', 'w') as f:
+                with open(output_dir + "int_markup/" +  folder[:-4] + '.json', 'w') as f:
                     json.dump(standard_output, f)
 
-                with open(output_dir + "patch_markup/" + image[:-4] + '.json', 'w') as f:
+                with open(output_dir + "patch_markup/" + folder[:-4] + '.json', 'w') as f:
                     json.dump(patch_output, f)     
 
     def process_list(input_str: str) -> list:
