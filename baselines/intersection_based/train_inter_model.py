@@ -1,3 +1,5 @@
+import sys
+sys.path.append(r'C:\Users\slava\Documents\AI\parking-research-argon')
 from inter_models import *
 from baselines.utils.common_utils import seed_everything, get_device
 from baselines.utils.inter_utils import *

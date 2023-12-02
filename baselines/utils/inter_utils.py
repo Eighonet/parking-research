@@ -7,7 +7,7 @@ import cv2
 import albumentations as A
 from albumentations.pytorch.transforms import ToTensorV2
 import re
-from common_utils import get_device
+from baselines.utils.common_utils import get_device
 
 device = get_device()
 
@@ -17,7 +17,7 @@ def parse_args():
 
     parser.add_argument('-d', '--dataframe', type=str, help='path to dataset dataframe')
 
-    parser.add_argument('-p', '--path', type=int, help='path to the dataset')
+    parser.add_argument('-p', '--path', type=str, help='path to the dataset')
 
     parser.add_argument('-m_t', '--model_type', type=str, help='model type')
 
@@ -134,10 +134,10 @@ def get_dataframes(original_dataframe):
     
     original_dataframe[['x', 'y', 'w', 'h']] = np.stack(original_dataframe['bbox'].apply(lambda x: expand_bbox(x)))
     original_dataframe.drop(columns=['bbox'], inplace=True)
-    original_dataframe['x'] = original_dataframe['x'].astype(np.float)
-    original_dataframe['y'] = original_dataframe['y'].astype(np.float)
-    original_dataframe['w'] = original_dataframe['w'].astype(np.float)
-    original_dataframe['h'] = original_dataframe['h'].astype(np.float)
+    original_dataframe['x'] = original_dataframe['x'].astype(np.cfloat)
+    original_dataframe['y'] = original_dataframe['y'].astype(np.cfloat)
+    original_dataframe['w'] = original_dataframe['w'].astype(np.cfloat)
+    original_dataframe['h'] = original_dataframe['h'].astype(np.cfloat)
 
     train_df = original_dataframe[original_dataframe['folder'] == 'train']
     valid_df = original_dataframe[original_dataframe['folder'] == 'val']
