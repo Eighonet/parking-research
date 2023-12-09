@@ -7,25 +7,6 @@ import cv2
 import albumentations as A
 from albumentations.pytorch.transforms import ToTensorV2
 import re
-from baselines.utils.common_utils import get_device
-
-device = get_device()
-
-def parse_args():
-
-    parser = argparse.ArgumentParser(description='Baseline training parameters')
-
-    parser.add_argument('-d', '--dataframe', type=str, help='path to dataset dataframe')
-
-    parser.add_argument('-p', '--path', type=str, help='path to the dataset')
-
-    parser.add_argument('-m_t', '--model_type', type=str, help='model type')
-
-    parser.add_argument('-bs', '--batch_size', type=str, help='batch_size')
-
-    args = parser.parse_args()
-
-    return args
 
 class ParkDataset(Dataset):
     def __init__(self, dataframe, image_dir, transforms=None):
@@ -145,7 +126,7 @@ def get_dataframes(original_dataframe):
     return train_df, valid_df
 
 
-def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader):
+def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, device):
 
     loss_hist = Averager()
     loss_hist_val = Averager()
