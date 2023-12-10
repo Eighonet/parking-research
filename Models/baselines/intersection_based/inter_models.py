@@ -45,7 +45,7 @@ def get_model(model_params):
 
     backbone.out_channels = model_params['out_channels']
 
-    new_anchor_generator = AnchorGenerator(sizes=((36, 64, 128, 256, 512),), 
+    new_anchor_generator = AnchorGenerator(sizes=((128, 256, 512),), 
                                         aspect_ratios=((0.5, 1.0, 2.0),))
     new_roi_pooler = MultiScaleRoIAlign(featmap_names=['0'], output_size=4, sampling_ratio=1)
 

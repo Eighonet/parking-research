@@ -55,7 +55,6 @@ class ParkDataset(Dataset):
             }
             sample = self.transforms(**sample)
             image = sample['image']
-            
             target['boxes'] = torch.stack(tuple(map(torch.FloatTensor, zip(*sample['bboxes'])))).permute(1, 0)
 
         return image, target, image_id
@@ -67,9 +66,7 @@ def get_train_transform(add_augmentations=False, augmentation_list=[]):
     if add_augmentations:
         return A.Compose(augmentation_list, bbox_params={'format': 'pascal_voc', 'label_fields': ['labels']})
     
-    return A.Compose([
-        ToTensorV2(p=1.0)
-    ], bbox_params={'format': 'pascal_voc', 'label_fields': ['labels']})
+    return A.Compose([ToTensorV2(p=1.0)], bbox_params={'format': 'pascal_voc', 'label_fields': ['labels']})
 
 def get_valid_transform():
     return A.Compose([
@@ -142,7 +139,7 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
         loss_hist.reset()
         
         for images, targets, image_ids in train_data_loader:
-            
+
             images = list(image.to(device) for image in images)
             targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
@@ -160,8 +157,9 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
             if itr % 5 == 0:
                 print(f"Iteration #{itr} loss: {loss_value}")
             itr += 1
-            
-        torch.save(model, os.path.join('Saved_Models/', str(epoch)+'.pth'))
+        if "Saved_Models" not in os.listdir():
+            os.mkdir("Saved_Models")
+        #torch.save(model, os.path.join('Saved_Models/', str(epoch)+'.pth'))
         
         itr_val = 1
         
@@ -191,3 +189,6 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
         if loss_hist.value < min_loss:
             print(f"Epoch #{epoch} is best")
             min_loss = loss_hist.value
+
+    torch.save(model, os.path.join('Saved_Models/', str(epoch)+'.pth'))
+    torch.save(model.state_dict(), os.path.join('Saved_Models/','state_dict'+'.pth'))
