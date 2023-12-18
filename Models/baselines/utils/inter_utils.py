@@ -7,6 +7,7 @@ import cv2
 import albumentations as A
 from albumentations.pytorch.transforms import ToTensorV2
 import re
+import matplotlib.pyplot as plt
 
 class ParkDataset(Dataset):
     def __init__(self, dataframe, image_dir, transforms=None):
@@ -62,18 +63,6 @@ class ParkDataset(Dataset):
     def __len__(self) -> int:
         return self.image_ids.shape[0]
 
-def get_train_transform(add_augmentations=False, augmentation_list=[]):
-    if add_augmentations:
-        return A.Compose(augmentation_list, bbox_params={'format': 'pascal_voc', 'label_fields': ['labels']})
-    
-    return A.Compose([ToTensorV2(p=1.0)], bbox_params={'format': 'pascal_voc', 'label_fields': ['labels']})
-
-def get_valid_transform():
-    return A.Compose([
-        ToTensorV2(p=1.0)
-    ], bbox_params={'format': 'pascal_voc', 'label_fields': ['labels']})
-
-
 class Averager:
     def __init__(self):
         self.current_total = 0.0
@@ -93,6 +82,17 @@ class Averager:
     def reset(self):
         self.current_total = 0.0
         self.iterations = 0.0
+
+def get_train_transform(add_augmentations=False, augmentation_list=[]):
+    if add_augmentations:
+        return A.Compose(augmentation_list, bbox_params={'format': 'pascal_voc', 'label_fields': ['labels']})
+    
+    return A.Compose([ToTensorV2(p=1.0)], bbox_params={'format': 'pascal_voc', 'label_fields': ['labels']})
+
+def get_valid_transform():
+    return A.Compose([
+        ToTensorV2(p=1.0)
+    ], bbox_params={'format': 'pascal_voc', 'label_fields': ['labels']})
 
 def collate_fn(batch):
     return tuple(zip(*batch))
@@ -192,3 +192,43 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
 
     torch.save(model, os.path.join('Saved_Models/', str(epoch)+'.pth'))
     torch.save(model.state_dict(), os.path.join('Saved_Models/','state_dict'+'.pth'))
+    
+def show_from_dataset(n, train_data_loader):
+    i = 0
+    for images, targets, image_ids in train_data_loader:
+        image = images
+        target = targets
+        image_id = image_ids
+        if i == n:
+            break
+        i +=1
+    pred_boxes = [[(x[0], x[1]), (x[2], x[3])] for x in list(targets[0]["boxes"].detach().numpy())]
+    image = image[0].permute(1,2,0)
+    image = image.detach().numpy()
+    for x in pred_boxes:
+        cv2.rectangle(image, (int(x[0][0]),int(x[0][1])), (int(x[1][0]),int(x[1][1])), color=(255, 0, 0), thickness=2)
+    fig = plt.figure(figsize=(15,15))
+    plt.imshow(image)
+    plt.axis("off")
+    
+def make_pred(model, img_batch, treshold):
+    pred = model(img_batch)
+    pred_boxes = [[(x[0], x[1]), (x[2], x[3])] for x in list(pred[0]["boxes"].detach().numpy())]
+    pred_class = list(pred[0]["labels"].detach().numpy())
+    pred_score = list(pred[0]["scores"].detach().numpy())
+    try:
+        over_treshold = [pred_score.index(x) for x in pred_score if x>treshold][-1]
+    except IndexError:
+        raise ValueError("No detection above threshold")
+    pred_boxes = pred_boxes[:over_treshold+1]
+    pred_class = pred_class[:over_treshold+1]
+    return pred_boxes, pred_score
+
+def show_inference(img_batch, model, img, treshold):
+    boxes, score = make_pred(model, img_batch, treshold)
+    for i, x in enumerate(boxes):
+        cv2.rectangle(img, (int(x[0][0]),int(x[0][1])), (int(x[1][0]),int(x[1][1])), color=(255, 0, 0), thickness=2)
+        cv2.putText(img, str(score[i]), (int(x[0][0]),int(x[0][1])), cv2.LINE_AA, 1.2, (255,0,0), 1)
+    plt.figure(figsize=(20,30))
+    plt.imshow(img)
+    plt.axis("off")
