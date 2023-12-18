@@ -26,7 +26,7 @@ mean = [0.485, 0.456, 0.406]
 std = [0.229, 0.224, 0.225]
 
 settings = {
-    "batch_size" : 1,
+    "batch_size" : 8,
     "dataframe" : "ACPDS/ACPDS/ACPDS_dataframe.csv",
     "path" : "ACPDS/ACPDS",
     "model_type" : "retinanet_resnet",

@@ -2,6 +2,7 @@ from torchvision.ops import MultiScaleRoIAlign
 from torchvision.models.detection.rpn import AnchorGenerator
 from torchvision.models.detection import FasterRCNN, RetinaNet
 import torchvision
+import torch
 
 
 min_size = 300
@@ -39,9 +40,11 @@ def get_model(model_params):
     if model_params['backbone'] == 'mobilenet_v2':
         backbone = torchvision.models.mobilenet_v2(pretrained=True).features
     if model_params['backbone'] == 'resnet50':
-        backbone = torchvision.models.resnet50(pretrained=True).features
+        resnet = torchvision.models.resnet50(pretrained=True)
+        modules = list(resnet.children())[:-1]
+        backbone = torch.nn.Sequential(*modules)
     if model_params['backbone'] == 'vgg19':
-        backbone = torchvision.models.vgg19(pretrained=True).features
+        backbone = torchvision.models.vgg19(pretrained=True)
 
     backbone.out_channels = model_params['out_channels']
 

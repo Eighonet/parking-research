@@ -143,7 +143,8 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
             images = list(image.to(device) for image in images)
             targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
-            loss_dict = model(images, targets)  
+            loss_dict = model(images, targets)
+            print(loss_dict)  
 
             losses = sum(loss for loss in loss_dict.values())
             loss_value = losses.item()
