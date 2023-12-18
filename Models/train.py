@@ -9,7 +9,6 @@ import torch
 from torch.utils.data import DataLoader, Dataset
 device = get_device()
 import warnings
-import cv2
 warnings.filterwarnings("ignore")
 import matplotlib.pyplot as plt
 
@@ -25,39 +24,41 @@ min_size = 300
 max_size = 500
 mean = [0.485, 0.456, 0.406]
 std = [0.229, 0.224, 0.225]
-class settings:
-    dataframe = "ACPDS/ACPDS/ACPDS_dataframe.csv"
-    path =  "ACPDS/ACPDS"
-    model_type = "faster_rcnn_vgg"
-    batch_size = 1
 
+settings = {
+    "batch_size" : 1,
+    "dataframe" : "ACPDS/ACPDS/ACPDS_dataframe.csv",
+    "path" : "ACPDS/ACPDS",
+    "model_type" : "retinanet_resnet",
+}
+experiment.log_parameters(settings)
 
 seed_everything(seed=420)
-args = settings()
 
-if args.model_type == 'faster_rcnn_mobilenet':
+#Get wanted model from inter models 
+if settings["model_type"] == 'faster_rcnn_mobilenet':
     model = get_model(faster_rcnn_mobilenet_params)
-elif args.model_type == 'faster_rcnn_resnet':
+elif settings["model_type"] == 'faster_rcnn_resnet':
     model = get_model(faster_rcnn_resnet_params)
-elif args.model_type == 'faster_rcnn_vgg':
+elif settings["model_type"] == 'faster_rcnn_vgg':
     model = get_model(faster_rcnn_vgg_params)
-elif args.model_type == 'retinanet_mobilenet':
+elif settings["model_type"] == 'retinanet_mobilenet':
     model = get_model(retinanet_mobilenet_params)
-elif args.model_type == 'retinanet_resnet':
+elif settings["model_type"] == 'retinanet_resnet':
     model = get_model(retinanet_resnet_params)
-elif args.model_type == 'retinanet_vgg':
+elif settings["model_type"] == 'retinanet_vgg':
     model = get_model(retinanet_vgg_params)
 else:
     raise Exception('Invalid model type')
 
 model.to(device)
 
-DIR_INPUT = os.path.join(args.path, 'splitted_images/')
+DIR_INPUT = os.path.join(settings["path"], 'splitted_images/')
 DIR_TRAIN = f'{DIR_INPUT}/train'
 DIR_VAL = f'{DIR_INPUT}/val'
 DIR_TEST = f'{DIR_INPUT}/test'
 
-dataframe = pd.read_csv(args.dataframe)
+dataframe = pd.read_csv(settings["dataframe"])
 
 train_df, valid_df = get_dataframes(dataframe)
 
@@ -69,14 +70,14 @@ valid_dataset = ParkDataset(valid_df, DIR_VAL, get_valid_transform())
 indices = torch.randperm(len(train_dataset)).tolist()
 train_data_loader = DataLoader(
     train_dataset,
-    batch_size=args.batch_size,
+    batch_size=settings["batch_size"],
     shuffle=False,
     #num_workers=4,
     collate_fn=collate_fn
 )
 valid_data_loader = DataLoader(
     valid_dataset,
-    batch_size=args.batch_size,
+    batch_size=settings["batch_size"],
     shuffle=False,
     #num_workers=4,
     collate_fn=collate_fn
