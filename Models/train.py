@@ -11,10 +11,11 @@ device = get_device()
 import warnings
 warnings.filterwarnings("ignore")
 import matplotlib.pyplot as plt
+from comet_ml.integration.pytorch import log_model
 
 experiment = comet_ml.Experiment(
     api_key="7foLFXCsKacyXf6RiMlUoFULq",
-    project_name="Parking_occupancy"
+    project_name="Parking_occupancy_SNP"
 )
 
 
@@ -27,6 +28,8 @@ std = [0.229, 0.224, 0.225]
 
 settings = {
     "batch_size" : 4,
+    "epochs" : 20,
+    "learning_rate": 0.005,
     "dataframe" : "datasets/CNRParkEXT/CNRParkEXT/CNRParkEXT_dataframe.csv",
     "path" : "datasets/CNRParkEXT/CNRParkEXT",
     "model_type" : "faster_rcnn_mobilenet",
@@ -84,10 +87,10 @@ valid_data_loader = DataLoader(
 )
 
 params = [p for p in model.parameters() if p.requires_grad]
-optimizer = torch.optim.SGD(params, lr=0.001, momentum=0.9, weight_decay=0.0005)
+optimizer = torch.optim.SGD(params, lr=settings["learning_rate"], momentum=0.9, weight_decay=0.0005)
 lr_scheduler_increase = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=10.0)
 lr_scheduler_decrease = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
 
-num_epochs = 100
-train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, device)
-experiment.end()
+train_inter_model(model, settings["epochs"], train_data_loader, valid_data_loader, device, experiment, settings, optimizer)
+#Save model to comet for inference
+log_model(experiment, model, model_name=settings["model_type"])

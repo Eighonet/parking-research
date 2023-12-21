@@ -123,18 +123,17 @@ def get_dataframes(original_dataframe):
     return train_df, valid_df
 
 
-def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, device):
+def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, device, experiment, settings, optimizer):
 
     save_epoch = 0
     loss_hist = Averager()
     loss_hist_val = Averager()
-    itr = 1
     min_loss = -np.inf
-    params = [p for p in model.parameters() if p.requires_grad]
-    optimizer = torch.optim.SGD(params, lr=0.001, momentum=0.9, weight_decay=0.0005)
+    #params = [p for p in model.parameters() if p.requires_grad]
+    #optimizer = torch.optim.SGD(params, lr=0.001, momentum=0.9, weight_decay=0.0005)
 
     for epoch in range(num_epochs):
-        
+        itr = 1
         model.train()
         
         loss_hist.reset()
@@ -148,17 +147,14 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
 
             losses = sum(loss for loss in loss_dict.values())
             loss_value = losses.item()
-
+            
+            experiment.log_metric("training batch loss", loss_value)
             loss_hist.send(loss_value)
 
             optimizer.zero_grad()
             losses.backward()
             optimizer.step()
-
-            if itr % 100 == 0:
-                print(f"Iteration #{itr} loss: {loss_value}")
             itr += 1
-        #torch.save(model, os.path.join('Saved_Models/', str(epoch)+'.pth'))
         
         itr_val = 1
         
@@ -174,32 +170,43 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
 
                 val_losses = sum(val_loss for val_loss in val_loss_dict.values())
                 val_loss_value = val_losses.item()
-
+                
+                experiment.log_metric("validation batch loss", val_loss_value)
                 loss_hist_val.send(val_loss_value)
 
-                if itr_val % 5 == 0:
-                    print(f"Validation Batch loss: {val_loss_value}")
+                #if itr_val % 5 == 0:
+                    #print(f"Validation Batch loss: {val_loss_value}")
                     
                 itr_val += 1
                 
-
+        experiment.log_metric("epoch average loss", loss_hist.value, epoch = epoch)
+        experiment.log_metric("epoch average validation loss", loss_hist_val.value, epoch = epoch)
+        
         print(f"\nEpoch #{epoch} train loss: {loss_hist.value}")
-        print(f"Epoch #{epoch} valid loss: {loss_hist_val.value}\n")    
+        print(f"Epoch #{epoch} valid loss: {loss_hist_val.value}\n")  
+          
         if loss_hist.value < min_loss:
             print(f"Epoch #{epoch} is best")
             min_loss = loss_hist.value
         
-        #Save every 50 epochs
-        if save_epoch == 50:
+        #Save every 10 epochs localy
+        if save_epoch == 10:
             if "Saved_Models" not in os.listdir():
-                os.mkdir("Saved_Models")
-            torch.save(model.state_dict(), os.path.join('Saved_Models/','state_dict_'+str(epoch)+'.pth'))
+                os.mkdir('Saved_Models')
+            if settings["model_type"] not in os.listdir('Saved_Models/'):
+                os.mkdir('Saved_Models/'+ settings["model_type"])
+            torch.save(model.state_dict(), os.path.join('Saved_Models/'+settings["model_type"],'state_dict_'+str(epoch)+'.pth'))
             save_epoch = 0
         save_epoch +=1
         
-    #torch.save(model, os.path.join('Saved_Models/', str(epoch)+'.pth'))
-    torch.save(model.state_dict(), os.path.join('Saved_Models/','state_dict_'+str(epoch)+'.pth')) ##Final save
-    
+    #Save after finishing training
+    if "Saved_Models" not in os.listdir():
+        os.mkdir('Saved_Models')
+    if settings["model_type"] not in os.listdir('Saved_Models/'):
+        os.mkdir('Saved_Models/'+ settings["model_type"])
+    torch.save(model.state_dict(), os.path.join('Saved_Models/'+settings["model_type"],'state_dict_'+str(epoch)+'_final'+'.pth')) ##Final save
+
+
 def show_from_dataset(n, train_data_loader):
     i = 0
     for images, targets, image_ids in train_data_loader:
