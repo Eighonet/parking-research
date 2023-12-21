@@ -12,6 +12,7 @@ import warnings
 warnings.filterwarnings("ignore")
 import matplotlib.pyplot as plt
 from comet_ml.integration.pytorch import log_model
+from datetime import datetime
 
 try:
     with open("api.key") as f:
@@ -24,6 +25,9 @@ experiment = comet_ml.Experiment(
     project_name="Parking_occupancy_SNP"
 )
 
+args = parse_args()
+if args.name:
+    experiment.set_name(args.name)
 
 #Settings
 #Instead of using argparse set the arguments here
@@ -31,20 +35,21 @@ min_size = 300
 max_size = 500
 mean = [0.485, 0.456, 0.406]
 std = [0.229, 0.224, 0.225]
-dataset = "CNRParkEXT"
+dataset = args.dataset
 
 settings = {
-    "batch_size" : 4,
-    "epochs" : 100,
+    "batch_size" : args.batch,
+    "epochs" : args.epoch,
     "learning_rate": 0.005,
     "dataframe" : "datasets/CNRParkEXT/CNRParkEXT/CNRParkEXT_dataframe.csv",
     "path" : "datasets/"+str(dataset)+'/'+str(dataset)+'/',
     "model_type" : "faster_rcnn_mobilenet",
+    "seed" : int(datetime.now().timestamp())
 }
 experiment.log_parameters(settings)
 experiment.log_dataset_info(dataset, path = settings["path"])
 
-seed_everything(seed=6942069)
+seed_everything(settings["seed"])
 
 #Get wanted model from inter models 
 if settings["model_type"] == 'faster_rcnn_mobilenet':
@@ -61,6 +66,9 @@ elif settings["model_type"] == 'retinanet_vgg':
     model = get_model(retinanet_vgg_params)
 else:
     raise Exception('Invalid model type')
+
+if args.saved:
+    model.load_state_dict(torch.load(args.saved))
 
 model.to(device)
 

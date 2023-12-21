@@ -9,6 +9,20 @@ from albumentations.pytorch.transforms import ToTensorV2
 import re
 import matplotlib.pyplot as plt
 
+models = ["faster_rcnn_mobilenet", "faster_rcnn_resnet", "faster_rcnn_vgg", "retinanet_mobilenet", "retinanet_resnet", "retinanet_vgg"]
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Interference training settings")
+    parser.add_argument('-d', '--dataset', type=str, help="Name of dataset located in /datasets directory")
+    parser.add_argument('-m', '--model', type=str, choices=models, help="Select a model type", const=models[0])
+    parser.add_argument('-e', '--epoch', type=int, help="Number of training epochs", const=50)
+    parser.add_argument('-s', '--saved', type=str, help="Path to saved model to retrain on new dataset", const = None)
+    parser.add_argument('-n', '--name', type=str, help="Name of experiment in comet", const = None)
+    parser.add_argument('-b', '--batch', type=int, help="Size of img batch", const = 4)
+    
+    args = parser.parse_args()
+    return args
+
 class ParkDataset(Dataset):
     def __init__(self, dataframe, image_dir, transforms=None):
         super().__init__()
