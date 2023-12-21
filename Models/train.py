@@ -13,8 +13,14 @@ warnings.filterwarnings("ignore")
 import matplotlib.pyplot as plt
 from comet_ml.integration.pytorch import log_model
 
+try:
+    with open("key.api") as f:
+        key = f.readline()
+except:
+    raise FileNotFoundError("Comet key.api not found!")
+
 experiment = comet_ml.Experiment(
-    api_key="7foLFXCsKacyXf6RiMlUoFULq",
+    api_key=key,
     project_name="Parking_occupancy_SNP"
 )
 
