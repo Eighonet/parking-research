@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 from comet_ml.integration.pytorch import log_model
 
 try:
-    with open("key.api") as f:
+    with open("api.key") as f:
         key = f.readline()
 except:
     raise FileNotFoundError("Comet key.api not found!")
