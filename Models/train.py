@@ -27,8 +27,8 @@ std = [0.229, 0.224, 0.225]
 
 settings = {
     "batch_size" : 4,
-    "dataframe" : "datasets/T10LOT/T10LOT/T10LOT_dataframe.csv",
-    "path" : "datasets/T10LOT/T10LOT",
+    "dataframe" : "datasets/CNRParkEXT/CNRParkEXT/CNRParkEXT_dataframe.csv",
+    "path" : "datasets/CNRParkEXT/CNRParkEXT",
     "model_type" : "faster_rcnn_mobilenet",
 }
 experiment.log_parameters(settings)
@@ -88,6 +88,6 @@ optimizer = torch.optim.SGD(params, lr=0.001, momentum=0.9, weight_decay=0.0005)
 lr_scheduler_increase = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=10.0)
 lr_scheduler_decrease = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
 
-num_epochs = 35
+num_epochs = 100
 train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, device)
 experiment.end()
