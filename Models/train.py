@@ -31,16 +31,18 @@ min_size = 300
 max_size = 500
 mean = [0.485, 0.456, 0.406]
 std = [0.229, 0.224, 0.225]
+dataset = "CNRParkEXT"
 
 settings = {
     "batch_size" : 4,
     "epochs" : 20,
     "learning_rate": 0.005,
     "dataframe" : "datasets/CNRParkEXT/CNRParkEXT/CNRParkEXT_dataframe.csv",
-    "path" : "datasets/CNRParkEXT/CNRParkEXT",
+    "path" : "datasets/"+str(dataset)+'/'+str(dataset)+'/',
     "model_type" : "faster_rcnn_mobilenet",
 }
 experiment.log_parameters(settings)
+experiment.log_dataset_info(dataset, path = settings["path"])
 
 seed_everything(seed=69)
 
