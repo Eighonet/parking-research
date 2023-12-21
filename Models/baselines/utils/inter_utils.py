@@ -162,10 +162,10 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
         with torch.no_grad():
             
             for val_images, val_targets, val_image_ids in valid_data_loader:
-                if itr_val == 1:
-                    for n, img in enumerate(val_images):
-                        experiment.log_image(img, name = "Epoch {}, image {} in valid batch {}".format(epoch, n, itr_val), annotations = val_targets[n])   
-                itr_val += 1
+                # if itr_val == 1:
+                #     for n, img in enumerate(val_images):
+                #         experiment.log_image(img, name = "Epoch {}, image {} in valid batch {}".format(epoch, n, itr_val), annotations = val_targets[n])   
+                # itr_val += 1
                 
                 val_images = list(val_image.to(device) for val_image in val_images)
                 val_targets = [{val_k: val_v.to(device) for val_k, val_v in val_t.items()} for val_t in val_targets]
@@ -177,6 +177,7 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
                 
                 experiment.log_metric("validation batch loss", val_loss_value)
                 loss_hist_val.send(val_loss_value)
+                itr_val = +1
                 
         experiment.log_metric("epoch average loss", loss_hist.value, epoch = epoch)
         experiment.log_metric("epoch average validation loss", loss_hist_val.value, epoch = epoch)

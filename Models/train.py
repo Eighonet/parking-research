@@ -15,7 +15,7 @@ from comet_ml.integration.pytorch import log_model
 
 try:
     with open("api.key") as f:
-        key = f.readline()
+        key = f.readline()[:-1]
 except:
     raise FileNotFoundError("Comet key.api not found!")
 
@@ -35,7 +35,7 @@ dataset = "CNRParkEXT"
 
 settings = {
     "batch_size" : 4,
-    "epochs" : 20,
+    "epochs" : 100,
     "learning_rate": 0.005,
     "dataframe" : "datasets/CNRParkEXT/CNRParkEXT/CNRParkEXT_dataframe.csv",
     "path" : "datasets/"+str(dataset)+'/'+str(dataset)+'/',
@@ -44,7 +44,7 @@ settings = {
 experiment.log_parameters(settings)
 experiment.log_dataset_info(dataset, path = settings["path"])
 
-seed_everything(seed=69)
+seed_everything(seed=6942069)
 
 #Get wanted model from inter models 
 if settings["model_type"] == 'faster_rcnn_mobilenet':
