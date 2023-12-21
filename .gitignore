@@ -12,3 +12,4 @@ annotators/widget_b/int_markup
 annotators/widget_b/patch_markup
 annotators/widget_a/parking_photos
 /DATASETS
+**/datasets
