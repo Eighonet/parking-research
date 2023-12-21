@@ -125,6 +125,7 @@ def get_dataframes(original_dataframe):
 
 def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, device):
 
+    save_epoch = 0
     loss_hist = Averager()
     loss_hist_val = Averager()
     itr = 1
@@ -144,7 +145,6 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
             targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
             loss_dict = model(images, targets)
-            print(loss_dict)  
 
             losses = sum(loss for loss in loss_dict.values())
             loss_value = losses.item()
@@ -155,16 +155,14 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
             losses.backward()
             optimizer.step()
 
-            if itr % 5 == 0:
+            if itr % 100 == 0:
                 print(f"Iteration #{itr} loss: {loss_value}")
             itr += 1
-        if "Saved_Models" not in os.listdir():
-            os.mkdir("Saved_Models")
         #torch.save(model, os.path.join('Saved_Models/', str(epoch)+'.pth'))
         
         itr_val = 1
         
-        
+        ##Validation
         with torch.no_grad():
             
             for val_images, val_targets, val_image_ids in valid_data_loader:
@@ -185,14 +183,22 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
                 itr_val += 1
                 
 
-        print(f"Epoch #{epoch} train loss: {loss_hist.value}")
-        print(f"Epoch #{epoch} valid loss: {loss_hist_val.value}")    
+        print(f"\nEpoch #{epoch} train loss: {loss_hist.value}")
+        print(f"Epoch #{epoch} valid loss: {loss_hist_val.value}\n")    
         if loss_hist.value < min_loss:
             print(f"Epoch #{epoch} is best")
             min_loss = loss_hist.value
-
-    torch.save(model, os.path.join('Saved_Models/', str(epoch)+'.pth'))
-    torch.save(model.state_dict(), os.path.join('Saved_Models/','state_dict'+'.pth'))
+        
+        #Save every 50 epochs
+        if save_epoch == 50:
+            if "Saved_Models" not in os.listdir():
+                os.mkdir("Saved_Models")
+            torch.save(model.state_dict(), os.path.join('Saved_Models/','state_dict_'+str(epoch)+'.pth'))
+            save_epoch = 0
+        save_epoch +=1
+        
+    #torch.save(model, os.path.join('Saved_Models/', str(epoch)+'.pth'))
+    torch.save(model.state_dict(), os.path.join('Saved_Models/','state_dict_'+str(epoch)+'.pth')) ##Final save
     
 def show_from_dataset(n, train_data_loader):
     i = 0

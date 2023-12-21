@@ -131,7 +131,7 @@ def pm_widget(annotation_path: str="annotations.json", image_dirs : str = "img",
 
     def forward_button_clicked(b):
         folders = sorted(list(annotator.markup.keys()))
-        files = [file for file in listdir(annotator.current_folder[:-4])]
+        files = [file for file in listdir(annotator.current_image[:-4])]
         idx = files.index(annotator.current_image)
         if idx < len(files) - 1:
             image_dropdown.value = files[idx+1]
@@ -142,7 +142,7 @@ def pm_widget(annotation_path: str="annotations.json", image_dirs : str = "img",
 
     def backward_button_clicked(b):
         folders = sorted(list(annotator.markup.keys()))
-        files = [file for file in listdir(annotator.current_folder[:-4])]
+        files = [file for file in listdir(annotator.current_image[:-4])]
         idx = files.index(annotator.current_image)
         if idx > 0:
             image_dropdown.value = files[idx-1]

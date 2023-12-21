@@ -81,7 +81,7 @@ def patch_ilm(dataset):
         if image_path.split('.')[-1] == "jpg":
             annot_path = f"{int_markup_dir}/{image_path.split('.')[0]}.json"
             annot = json.load(open(annot_path))
-            for lot in annot:
+            for lot in annot["lots"]:
                 
                 class_dir = "Busy" if lot['label'] else "Free"                
                 crop_name = f"image_{count}.jpg"
@@ -120,13 +120,6 @@ def splitter(dataset, train_ratio=0.6, val_ratio=0.1, test_ratio=0.3):
     os.mkdir(f"{main_dir}/splitted_images/val")
     os.mkdir(f"{main_dir}/splitted_images/test")
 
-    os.mkdir(f"{main_dir}/splitted_images/train/Busy")
-    os.mkdir(f"{main_dir}/splitted_images/train/Free")
-    os.mkdir(f"{main_dir}/splitted_images/val/Busy")
-    os.mkdir(f"{main_dir}/splitted_images/val/Free")
-    os.mkdir(f"{main_dir}/splitted_images/test/Busy")
-    os.mkdir(f"{main_dir}/splitted_images/test/Free")
-
     os.mkdir(f"{main_dir}/patch_splitted")
     os.mkdir(f"{main_dir}/patch_splitted/train")
     os.mkdir(f"{main_dir}/patch_splitted/val")
@@ -161,27 +154,21 @@ def splitter(dataset, train_ratio=0.6, val_ratio=0.1, test_ratio=0.3):
 
     for image in busy_train:
         shutil.copy(f"{patch_dir}/Busy/{image}", f"{main_dir}/patch_splitted/train/Busy/{image}")
-        shutil.copy(f"{int_markup_dir}/{image}", f"{main_dir}/splitted_images/train/Busy/{image}")
 
     for image in busy_val:
         shutil.copy(f"{patch_dir}/Busy/{image}", f"{main_dir}/patch_splitted/val/Busy/{image}")
-        shutil.copy(f"{int_markup_dir}/{image}", f"{main_dir}/splitted_images/val/Busy/{image}")
 
     for image in busy_test:
         shutil.copy(f"{patch_dir}/Busy/{image}", f"{main_dir}/patch_splitted/test/Busy/{image}")
-        shutil.copy(f"{int_markup_dir}/{image}", f"{main_dir}/splitted_images/test/Busy/{image}")
 
     for image in free_train:
         shutil.copy(f"{patch_dir}/Free/{image}", f"{main_dir}/patch_splitted/train/Free/{image}")
-        shutil.copy(f"{int_markup_dir}/{image}", f"{main_dir}/splitted_images/train/Free/{image}")
 
     for image in free_val:
         shutil.copy(f"{patch_dir}/Free/{image}", f"{main_dir}/patch_splitted/val/Free/{image}")
-        shutil.copy(f"{int_markup_dir}/{image}", f"{main_dir}/splitted_images/val/Free/{image}")
 
     for image in free_test:
         shutil.copy(f"{patch_dir}/Free/{image}", f"{main_dir}/patch_splitted/test/Free/{image}")
-        shutil.copy(f"{int_markup_dir}/{image}", f"{main_dir}/splitted_images/test/Free/{image}")
 
     images_list = os.listdir(f"{main_dir}/images")
     random.shuffle(images_list)

@@ -26,14 +26,14 @@ mean = [0.485, 0.456, 0.406]
 std = [0.229, 0.224, 0.225]
 
 settings = {
-    "batch_size" : 8,
-    "dataframe" : "ACPDS/ACPDS/ACPDS_dataframe.csv",
-    "path" : "ACPDS/ACPDS",
-    "model_type" : "retinanet_resnet",
+    "batch_size" : 4,
+    "dataframe" : "datasets/T10LOT/T10LOT/T10LOT_dataframe.csv",
+    "path" : "datasets/T10LOT/T10LOT",
+    "model_type" : "faster_rcnn_mobilenet",
 }
 experiment.log_parameters(settings)
 
-seed_everything(seed=420)
+seed_everything(seed=69)
 
 #Get wanted model from inter models 
 if settings["model_type"] == 'faster_rcnn_mobilenet':
@@ -88,9 +88,6 @@ optimizer = torch.optim.SGD(params, lr=0.001, momentum=0.9, weight_decay=0.0005)
 lr_scheduler_increase = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=10.0)
 lr_scheduler_decrease = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
 
-num_epochs = 100
-
-#show_from_dataset(10, valid_data_loader)
-
+num_epochs = 35
 train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, device)
 experiment.end()

@@ -53,6 +53,10 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
                     plt.draw()
 
                     self.xdata, self.ydata = [], []
+                    
+    def copy_to_all(b):
+        for image in images:
+            annotator.annotation_dict[image] = annotator.annotation_dict[annotator.image]
     
     #Returns image
     def load_image(path):
@@ -200,6 +204,7 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
     fig, axes = plt.subplots(figsize=[10,10], num='Markup widget rev2')
     axes.imshow(img)
     plt.axis("off")
+    fig.get_tight_layout()
 
     annotator = Annotator(axes)
     annotator.annotation_dict[path.value], annotator.image = [], path.value
@@ -209,18 +214,20 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
     button_paint = widgets.Button(description="Annotate", style={'button_color': '#eeeeee'}, layout={'width': '80px'})
     button_trash = widgets.Button(description="Delete", layout={'width': '60px'})
     button_download = widgets.Button(description="Save", layout={'width': '60px'})
+    button_apply_to_all = widgets.Button(description="Apply to all")
 
     button_forward = widgets.Button(description="→", layout={'width': '35px'})
     button_backward = widgets.Button(description="←", layout={'width': '35px'})
     dropdown = Dropdown(options=images)
     dropdown_block = Box([Label(value='Select image'), dropdown])
 
-    tool_box = HBox([button_paint, button_trash, button_backward, button_forward, dropdown, button_download])
+    tool_box = HBox([button_paint, button_trash, button_backward, button_forward, dropdown, button_download, button_apply_to_all])
     menu_box = VBox([tool_box])
 
     button_paint.on_click(paint_button_clicked)
     button_trash.on_click(trash_button_clicked)
     button_download.on_click(download_button_clicked)
+    button_apply_to_all.on_click(copy_to_all)
 
     button_forward.on_click(forward_button_clicked)
     button_backward.on_click(backward_button_clicked)
