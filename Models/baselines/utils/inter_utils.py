@@ -182,7 +182,7 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
         experiment.log_metric("epoch average validation loss", loss_hist_val.value, epoch = epoch)
         experiment.log_epoch_end(epoch)
         
-        print(f"\nEpoch #{epoch} train loss: {loss_hist.value}")
+        print(f"Epoch #{epoch} train loss: {loss_hist.value}")
         print(f"Epoch #{epoch} valid loss: {loss_hist_val.value}\n")  
           
         if loss_hist.value < min_loss:
