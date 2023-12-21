@@ -266,10 +266,10 @@ def main():
     args = parser.parse_args()
     dataset = args.dataset
 
-    #img_annotation_classes(dataset)
-    #patch_crop(dataset)
-    #patch_ilm(dataset)
-    #splitter(dataset)
+    img_annotation_classes(dataset)
+    patch_crop(dataset)
+    patch_ilm(dataset)
+    splitter(dataset)
     get_dataframe(dataset)
 
 if __name__ == '__main__':
