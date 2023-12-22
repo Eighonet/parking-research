@@ -138,7 +138,9 @@ def get_dataframes(original_dataframe):
 
 
 def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, device, experiment, settings, optimizer):
-
+    model.train()
+    itr = 0
+    itr_val = 0
     save_epoch = 0
     loss_hist = Averager()
     loss_hist_val = Averager()
@@ -147,10 +149,7 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
     #optimizer = torch.optim.SGD(params, lr=0.001, momentum=0.9, weight_decay=0.0005)
 
     for epoch in range(num_epochs):
-        itr = 1
-        model.train()
-        
-        loss_hist.reset()
+        loss_hist.reset() #Resets to average just one epoch
         
         for images, targets, image_ids in train_data_loader:
 
@@ -162,7 +161,7 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
             losses = sum(loss for loss in loss_dict.values())
             loss_value = losses.item()
             
-            experiment.log_metric("training batch loss", loss_value)
+            experiment.log_metric("training batch loss", loss_value, step = itr)
             loss_hist.send(loss_value)
 
             optimizer.zero_grad()
@@ -170,11 +169,9 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
             optimizer.step()
             itr += 1
         
-        itr_val = 1
-        
         ##Validation
         with torch.no_grad():
-            
+            loss_hist_val.reset() #Resets to average just one epoch
             for val_images, val_targets, val_image_ids in valid_data_loader:
                 # if itr_val == 1:
                 #     for n, img in enumerate(val_images):
@@ -189,9 +186,9 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
                 val_losses = sum(val_loss for val_loss in val_loss_dict.values())
                 val_loss_value = val_losses.item()
                 
-                experiment.log_metric("validation batch loss", val_loss_value)
+                experiment.log_metric("validation batch loss", val_loss_value, step = itr_val)
                 loss_hist_val.send(val_loss_value)
-                itr_val = +1
+                itr_val += 1
                 
         experiment.log_metric("epoch average loss", loss_hist.value, epoch = epoch)
         experiment.log_metric("epoch average validation loss", loss_hist_val.value, epoch = epoch)
