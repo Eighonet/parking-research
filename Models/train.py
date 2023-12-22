@@ -40,7 +40,7 @@ dataset = args.dataset
 settings = {
     "batch_size" : args.batch,
     "epochs" : args.epoch,
-    "learning_rate": 0.005,
+    "learning_rate": 0.01,
     "dataframe" : "datasets/"+str(dataset)+"/"+str(dataset)+"/"+str(dataset)+"_dataframe.csv",
     "path" : "datasets/"+str(dataset)+'/'+str(dataset)+'/',
     "model_type" : args.model,

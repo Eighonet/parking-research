@@ -256,8 +256,9 @@ def show_from_dataset(n, train_data_loader):
     plt.axis("off")
 
 #Takes only one image not a batch!!
-def test_model(model, data_loader, treshold = 0.9):
+def test_model(model, data_loader, treshold = 0.9, plot = 0):
     model.eval()
+    pic_count = 1
     for images, targets, image_ids in data_loader:
         pred_boxes, pred_score = make_pred(model, images, treshold)
         
@@ -267,9 +268,45 @@ def test_model(model, data_loader, treshold = 0.9):
         image_id = image_ids[0]
         boxes = [[(x[0], x[1]), (x[2], x[3])] for x in list(target["boxes"].detach().numpy())]
         
+        #Plot targets        
+        for x in boxes:
+            cv2.rectangle(image, (int(x[0][0]),int(x[0][1])), (int(x[1][0]),int(x[1][1])), color=(255, 0, 0), thickness=2)
         
-        break
+        points = calculate_acc(boxes, pred_boxes)
+        for n, point in enumerate(points["mid_point"]):
+            if points["label"][n]:
+                cv2.circle(image, point, 10, (0,255,0), -1)
+            else:
+                cv2.circle(image, point, 10, (255,0,0), -1)
+        
+        if plot:
+            if pic_count == plot:
+                plt.figure(figsize=(10,10))
+                plt.imshow(image)
+                plt.axis("off")
+        pic_count  += 1
 
+def calculate_acc(targets, predicted):
+    results = {}
+    results["mid_point"] = []
+    results["label"] = []
+    
+    for box in predicted:
+        mid_point = (int((box[0][0]+box[1][0])/2), int((box[0][1]+box[1][1])/2))
+        results["mid_point"].append(mid_point)
+        if in_box(mid_point, box):
+            results["label"].append(True) 
+        else:
+            results['label'].append(False)
+    return results
+
+#Takes two coordinates of a box and a point and checks if the point lies inside
+def in_box(point, box):
+    if (point[0] > box[0][0] and point[1] < box[1][0]) and (point[1] > box[0][1] and point[1] < box[1][1]):
+        return True
+    else:
+        False
+ 
 def load_model(model, device, path):
     if device.type == 'cpu':
         model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
