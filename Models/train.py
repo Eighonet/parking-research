@@ -43,7 +43,7 @@ settings = {
     "learning_rate": 0.005,
     "dataframe" : "datasets/CNRParkEXT/CNRParkEXT/CNRParkEXT_dataframe.csv",
     "path" : "datasets/"+str(dataset)+'/'+str(dataset)+'/',
-    "model_type" : "faster_rcnn_mobilenet",
+    "model_type" : args.model,
     "seed" : int(datetime.now().timestamp())
 }
 experiment.log_parameters(settings)
