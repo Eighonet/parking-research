@@ -133,9 +133,27 @@ def get_dataframes(original_dataframe):
 
     train_df = original_dataframe[original_dataframe['folder'] == 'train']
     valid_df = original_dataframe[original_dataframe['folder'] == 'val']
-
+    test_df = original_dataframe[original_dataframe['folder'] == 'test']
+    
     return train_df, valid_df
 
+def get_testDataframe(original_dataframe):
+
+    original_dataframe['x'] = -1
+    original_dataframe['y'] = -1
+    original_dataframe['w'] = -1
+    original_dataframe['h'] = -1
+    
+    original_dataframe[['x', 'y', 'w', 'h']] = np.stack(original_dataframe['bbox'].apply(lambda x: expand_bbox(x)))
+    original_dataframe.drop(columns=['bbox'], inplace=True)
+    original_dataframe['x'] = original_dataframe['x'].astype(np.cfloat)
+    original_dataframe['y'] = original_dataframe['y'].astype(np.cfloat)
+    original_dataframe['w'] = original_dataframe['w'].astype(np.cfloat)
+    original_dataframe['h'] = original_dataframe['h'].astype(np.cfloat)
+
+    test_df = original_dataframe[original_dataframe['folder'] == 'test']
+    
+    return test_df
 
 def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, device, experiment, settings, optimizer):
     model.train()
@@ -236,7 +254,29 @@ def show_from_dataset(n, train_data_loader):
     fig = plt.figure(figsize=(15,15))
     plt.imshow(image)
     plt.axis("off")
-    
+
+#Takes only one image not a batch!!
+def test_model(model, data_loader, treshold = 0.9):
+    model.eval()
+    for images, targets, image_ids in data_loader:
+        pred_boxes, pred_score = make_pred(model, images, treshold)
+        
+        #Extracting targets and images
+        image = images[0].detach().permute(1,2,0).numpy()
+        target = targets[0]
+        image_id = image_ids[0]
+        boxes = [[(x[0], x[1]), (x[2], x[3])] for x in list(target["boxes"].detach().numpy())]
+        
+        
+        break
+
+def load_model(model, device, path):
+    if device.type == 'cpu':
+        model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
+    else:
+        model.load_state_dict(torch.load(path))
+        model.cuda()
+
 def make_pred(model, img_batch, treshold):
     pred = model(img_batch)
     pred_boxes = [[(x[0], x[1]), (x[2], x[3])] for x in list(pred[0]["boxes"].detach().numpy())]
