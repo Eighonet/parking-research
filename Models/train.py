@@ -13,6 +13,7 @@ warnings.filterwarnings("ignore")
 import matplotlib.pyplot as plt
 from comet_ml.integration.pytorch import log_model
 from datetime import datetime
+args = parse_args()
 
 try:
     with open("api.key") as f:
@@ -25,7 +26,6 @@ experiment = comet_ml.Experiment(
     project_name="Parking_occupancy_SNP"
 )
 
-args = parse_args()
 if args.name:
     experiment.set_name(args.name)
 
