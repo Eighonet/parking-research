@@ -14,11 +14,11 @@ models = ["faster_rcnn_mobilenet", "faster_rcnn_resnet", "faster_rcnn_vgg", "ret
 def parse_args():
     parser = argparse.ArgumentParser(description="Interference training settings")
     parser.add_argument('-d', '--dataset', type=str, help="Name of dataset located in /datasets directory")
-    parser.add_argument('-m', '--model', type=str, choices=models, help="Select a model type", const=models[0])
-    parser.add_argument('-e', '--epoch', type=int, help="Number of training epochs", const=50)
-    parser.add_argument('-s', '--saved', type=str, help="Path to saved model to retrain on new dataset", const = None)
-    parser.add_argument('-n', '--name', type=str, help="Name of experiment in comet", const = None)
-    parser.add_argument('-b', '--batch', type=int, help="Size of img batch", const = 4)
+    parser.add_argument('-m', '--model', type=str, choices=models, help="Select a model type", default=models[0])
+    parser.add_argument('-e', '--epoch', type=int, help="Number of training epochs", default=50)
+    parser.add_argument('-s', '--saved', type=str, help="Path to saved model to retrain on new dataset", default = None)
+    parser.add_argument('-n', '--name', type=str, help="Name of experiment in comet", default = None)
+    parser.add_argument('-b', '--batch', type=int, help="Size of img batch", default = 4)
     
     args = parser.parse_args()
     return args
