@@ -44,7 +44,7 @@ def get_model(model_params):
         modules = list(resnet.children())[:-1]
         backbone = torch.nn.Sequential(*modules)
     if model_params['backbone'] == 'vgg19':
-        backbone = torchvision.models.vgg19(pretrained=True)
+        backbone = torchvision.models.vgg19(pretrained=True).features
 
     backbone.out_channels = model_params['out_channels']
 
