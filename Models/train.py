@@ -30,7 +30,6 @@ if args.name:
     experiment.set_name(args.name)
 
 #Settings
-#Instead of using argparse set the arguments here
 min_size = 300
 max_size = 500
 mean = [0.485, 0.456, 0.406]
@@ -40,7 +39,7 @@ dataset = args.dataset
 settings = {
     "batch_size" : args.batch,
     "epochs" : args.epoch,
-    "learning_rate": 0.01,
+    "learning_rate": args.rate,
     "dataframe" : "datasets/"+str(dataset)+"/"+str(dataset)+"/"+str(dataset)+"_dataframe.csv",
     "path" : "datasets/"+str(dataset)+'/'+str(dataset)+'/',
     "model_type" : args.model,
@@ -67,8 +66,9 @@ elif settings["model_type"] == 'retinanet_vgg':
 else:
     raise Exception('Invalid model type')
 
+#Loads exisint model for retraining
 if args.saved:
-    model.load_state_dict(torch.load(args.saved))
+    load_model(model, device, args.saved)
 
 model.to(device)
 
@@ -81,11 +81,11 @@ dataframe = pd.read_csv(settings["dataframe"])
 
 train_df, valid_df = get_dataframes(dataframe)
 
-# dataloaders
+# Dataset
 train_dataset = ParkDataset(train_df, DIR_TRAIN, get_train_transform())
 valid_dataset = ParkDataset(valid_df, DIR_VAL, get_valid_transform())
 
-# split the dataset in train and test set
+# Split the dataset in train and test set and create a data loader
 indices = torch.randperm(len(train_dataset)).tolist()
 train_data_loader = DataLoader(
     train_dataset,
@@ -102,13 +102,18 @@ valid_data_loader = DataLoader(
     collate_fn=collate_fn
 )
 
+# Parameters that require grading (optimizing)
 params = [p for p in model.parameters() if p.requires_grad]
+
+#Create an optimizer
+#SGD
 #optimizer = torch.optim.SGD(params, lr=settings["learning_rate"], momentum=0.9, weight_decay=0.0005)
-optimizer = torch.optim.adam(params, lr=settings["learning_rate"], weight_decay=0.001)
+#Adam
+optimizer = torch.optim.Adam(params, lr=settings["learning_rate"], weight_decay=0.01)
 
 lr_scheduler_increase = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=10.0)
 lr_scheduler_decrease = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
 
-train_inter_model(model, settings["epochs"], train_data_loader, valid_data_loader, device, experiment, settings, optimizer)
+train_inter_model(model, settings["epochs"], train_data_loader, valid_data_loader, device, experiment, settings, optimizer, lr_scheduler_increase)
 #Save model to comet for inference
 log_model(experiment, model, model_name=settings["model_type"])

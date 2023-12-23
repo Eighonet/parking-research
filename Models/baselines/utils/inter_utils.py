@@ -20,6 +20,7 @@ def parse_args():
     parser.add_argument('-s', '--saved', type=str, help="Path to saved model to retrain on new dataset", default = None)
     parser.add_argument('-n', '--name', type=str, help="Name of experiment in comet", default = None)
     parser.add_argument('-b', '--batch', type=int, help="Size of img batch", default = 4)
+    parser.add_argument('-r', '--rate', type=float, help="Learning rate", default = 0.01)
     
     args = parser.parse_args()
     return args
@@ -156,7 +157,7 @@ def get_testDataframe(original_dataframe):
     
     return test_df
 
-def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, device, experiment, settings, optimizer):
+def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, device, experiment, settings, optimizer, scheduler):
     model.train()
     itr = 0
     itr_val = 0
@@ -212,9 +213,12 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
         experiment.log_metric("epoch average loss", loss_hist.value, epoch = epoch)
         experiment.log_metric("epoch average validation loss", loss_hist_val.value, epoch = epoch)
         experiment.log_epoch_end(epoch)
+        experiment.log_metric("optim learning rate", optimizer.param_groups[0]["lr"], epoch = epoch)
+        #scheduler.step()
         
         print(f"Epoch #{epoch} train loss: {loss_hist.value}")
         print(f"Epoch #{epoch} valid loss: {loss_hist_val.value}\n")  
+        print(f"Oprimizer learning rate #{optimizer.param_groups[0]['lr']}")
           
         if loss_hist.value < min_loss:
             print(f"Epoch #{epoch} is best")
@@ -225,7 +229,7 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
             if "Saved_Models" not in os.listdir():
                 os.mkdir('Saved_Models')
             if settings["model_type"] not in os.listdir('Saved_Models/'):
-                os.mkdir('Saved_Models/'+ settings["model_type"])
+                os.mkdir('Saved_Models/'+ str(experiment.get_name()))
             torch.save(model.state_dict(), os.path.join('Saved_Models/'+settings["model_type"],'state_dict_'+str(epoch)+'.pth'))
             save_epoch = 0
         save_epoch +=1

@@ -1,6 +1,7 @@
 from torchvision.ops import MultiScaleRoIAlign
 from torchvision.models.detection.rpn import AnchorGenerator
-from torchvision.models.detection import FasterRCNN, RetinaNet
+from torchvision.models.detection import FasterRCNN, RetinaNet, FasterRC
+from torchvision.models import ResNet50_Weights, MobileNet_V2_Weights, MobileNet_V3_Small_Weights, MobileNet_V3_Large_Weights, VGG19_Weights
 import torchvision
 import torch
 
@@ -38,15 +39,24 @@ retinanet_vgg_params = {'backbone': 'vgg19',
 def get_model(model_params):
 
     if model_params['backbone'] == 'mobilenet_v2':
-        backbone = torchvision.models.mobilenet_v2(pretrained=True).features
+        backbone = torchvision.models.mobilenet_v2(weights = MobileNet_V2_Weights.DEFAULT).features
+        
+    if model_params['backbone'] == 'mobilenet_v3_small':
+        backbone = torchvision.models.mobilenet_v3_small(weights = MobileNet_V3_Small_Weights.DEFAULT).features
+    
+    if model_params['backbone'] == 'mobilenet_v3_large':
+        backbone = torchvision.models.mobilenet_v3_large(weights = MobileNet_V3_Large_Weights.DEFAULT).features
+    
     if model_params['backbone'] == 'resnet50':
-        resnet = torchvision.models.resnet50(pretrained=True)
+        resnet = torchvision.models.resnet50(weights = ResNet50_Weights.DEFAULT)
         modules = list(resnet.children())[:-1]
         backbone = torch.nn.Sequential(*modules)
+        
     if model_params['backbone'] == 'vgg19':
-        backbone = torchvision.models.vgg19(pretrained=True).features
-
-    backbone.out_channels = model_params['out_channels']
+        backbone = torchvision.models.vgg19(weights = VGG19_Weights.DEFAULT).features
+    
+    if model_params['backbone']:
+        backbone.out_channels = model_params['out_channels']
 
     new_anchor_generator = AnchorGenerator(sizes=((32, 64, 128, 256, 512),), 
                                         aspect_ratios=((0.5, 1.0, 2.0),))
@@ -70,4 +80,5 @@ def get_model(model_params):
                             image_mean=mean, 
                             image_std=std,
                             anchor_generator = new_anchor_generator)
+
     return model
