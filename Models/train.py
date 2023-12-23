@@ -43,7 +43,8 @@ settings = {
     "dataframe" : "datasets/"+str(dataset)+"/"+str(dataset)+"/"+str(dataset)+"_dataframe.csv",
     "path" : "datasets/"+str(dataset)+'/'+str(dataset)+'/',
     "model_type" : args.model,
-    "seed" : int(datetime.now().timestamp())
+    "seed" : int(datetime.now().timestamp()),
+    "save_rate" : args.saveRate
 }
 experiment.log_parameters(settings)
 experiment.log_dataset_info(dataset, path = settings["path"])

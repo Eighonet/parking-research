@@ -22,6 +22,7 @@ def parse_args():
     parser.add_argument('-n', '--name', type=str, help="Name of experiment in comet", default = None)
     parser.add_argument('-b', '--batch', type=int, help="Size of img batch", default = 4)
     parser.add_argument('-r', '--rate', type=float, help="Learning rate", default = 0.01)
+    parser.add_argument('--saveRate', type=int, help="Save every x epochs", default = 20)
     
     args = parser.parse_args()
     return args
