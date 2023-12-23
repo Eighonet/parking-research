@@ -228,7 +228,7 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
         if save_epoch == 10:
             if "Saved_Models" not in os.listdir():
                 os.mkdir('Saved_Models')
-            if settings["model_type"] not in os.listdir('Saved_Models/'):
+            if str(experiment.get_name()) not in os.listdir('Saved_Models/'):
                 os.mkdir('Saved_Models/'+ str(experiment.get_name()))
             torch.save(model.state_dict(), os.path.join('Saved_Models/'+settings["model_type"],'state_dict_'+str(epoch)+'.pth'))
             save_epoch = 0
