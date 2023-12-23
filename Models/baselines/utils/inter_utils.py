@@ -165,8 +165,12 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
     loss_hist = Averager()
     loss_hist_val = Averager()
     min_loss = -np.inf
-    #params = [p for p in model.parameters() if p.requires_grad]
-    #optimizer = torch.optim.SGD(params, lr=0.001, momentum=0.9, weight_decay=0.0005)
+    
+    #Creating saving directory
+    if "Saved_Models" not in os.listdir():
+        os.mkdir('Saved_Models')
+        if str(experiment.get_name()) not in os.listdir('Saved_Models/'):
+            os.mkdir('Saved_Models/'+ str(experiment.get_name()))
 
     for epoch in range(num_epochs):
         loss_hist.reset() #Resets to average just one epoch
@@ -218,28 +222,20 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
         
         print(f"Epoch #{epoch} train loss: {loss_hist.value}")
         print(f"Epoch #{epoch} valid loss: {loss_hist_val.value}\n")  
-        print(f"Oprimizer learning rate #{optimizer.param_groups[0]['lr']}")
+        #print(f"Optimizer learning rate #{optimizer.param_groups[0]['lr']}")
           
         if loss_hist.value < min_loss:
             print(f"Epoch #{epoch} is best")
             min_loss = loss_hist.value
         
-        #Save every 10 epochs localy
-        if save_epoch == 50:
-            if "Saved_Models" not in os.listdir():
-                os.mkdir('Saved_Models')
-            if str(experiment.get_name()) not in os.listdir('Saved_Models/'):
-                os.mkdir('Saved_Models/'+ str(experiment.get_name()))
-            torch.save(model.state_dict(), os.path.join('Saved_Models/'+settings["model_type"],'state_dict_'+str(epoch)+'.pth'))
+        #Save every x epochs localy
+        if save_epoch == settings["save_rate"]:
+            torch.save(model.state_dict(), os.path.join('Saved_Models/'+str(experiment.get_name()),'state_dict_'+str(epoch)+'.pth'))
             save_epoch = 0
         save_epoch +=1
         
     #Save after finishing training
-    if "Saved_Models" not in os.listdir():
-        os.mkdir('Saved_Models')
-    if settings["model_type"] not in os.listdir('Saved_Models/'):
-        os.mkdir('Saved_Models/'+ settings["model_type"])
-    torch.save(model.state_dict(), os.path.join('Saved_Models/'+settings["model_type"],'state_dict_'+str(epoch)+'_final'+'.pth')) ##Final save
+    torch.save(model.state_dict(), os.path.join('Saved_Models/'+str(experiment.get_name()),'state_dict_final'+'.pth')) ##Final save
 
 def show_from_dataset(n, train_data_loader):
     i = 1
