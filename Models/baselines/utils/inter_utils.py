@@ -8,6 +8,7 @@ import albumentations as A
 from albumentations.pytorch.transforms import ToTensorV2
 import re
 import matplotlib.pyplot as plt
+import warnings
 
 models = ["faster_rcnn_mobilenet", "faster_rcnn_resnet", "faster_rcnn_vgg", "retinanet_mobilenet", "retinanet_resnet", "retinanet_vgg"]
 
@@ -236,9 +237,8 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
         os.mkdir('Saved_Models/'+ settings["model_type"])
     torch.save(model.state_dict(), os.path.join('Saved_Models/'+settings["model_type"],'state_dict_'+str(epoch)+'_final'+'.pth')) ##Final save
 
-
 def show_from_dataset(n, train_data_loader):
-    i = 0
+    i = 1
     for images, targets, image_ids in train_data_loader:
         image = images
         target = targets
@@ -259,6 +259,7 @@ def show_from_dataset(n, train_data_loader):
 def test_model(model, data_loader, treshold = 0.9, plot = 0):
     model.eval()
     pic_count = 1
+    accuracy_list = []
     for images, targets, image_ids in data_loader:
         pred_boxes, pred_score = make_pred(model, images, treshold)
         
@@ -268,37 +269,56 @@ def test_model(model, data_loader, treshold = 0.9, plot = 0):
         image_id = image_ids[0]
         boxes = [[(x[0], x[1]), (x[2], x[3])] for x in list(target["boxes"].detach().numpy())]
         
-        #Plot targets        
-        for x in boxes:
-            cv2.rectangle(image, (int(x[0][0]),int(x[0][1])), (int(x[1][0]),int(x[1][1])), color=(255, 0, 0), thickness=2)
-        
-        points = calculate_acc(boxes, pred_boxes)
-        for n, point in enumerate(points["mid_point"]):
-            if points["label"][n]:
-                cv2.circle(image, point, 10, (0,255,0), -1)
-            else:
-                cv2.circle(image, point, 10, (255,0,0), -1)
+        boxes_dict, points_dict, acc = calculate_acc(boxes, pred_boxes)
+        accuracy_list.append(acc)
         
         if plot:
             if pic_count == plot:
+                image = draw_to_image(image, boxes_dict, points_dict)
                 plt.figure(figsize=(10,10))
                 plt.imshow(image)
                 plt.axis("off")
         pic_count  += 1
+    return accuracy_list
 
 def calculate_acc(targets, predicted):
     results = {}
-    results["mid_point"] = []
-    results["label"] = []
+    results["boxes"] = []
+    results["labels"] = [False] * len(targets)
+    points = {}
+    points["points"] = []
+    points["labels"] = []
     
     for box in predicted:
-        mid_point = (int((box[0][0]+box[1][0])/2), int((box[0][1]+box[1][1])/2))
-        results["mid_point"].append(mid_point)
-        if in_box(mid_point, box):
-            results["label"].append(True) 
+        points["points"].append((int((box[0][0]+box[1][0])/2), int((box[0][1]+box[1][1])/2)))
+        points["labels"].append(False)
+        
+    for n, box in enumerate(targets):
+        results['boxes'].append(box)
+        for i, point in enumerate(points["points"]):
+            if in_box(point, box):
+                results["labels"][n] = True
+                points["labels"][i] = True
+    
+    acc = results["labels"].count(True) / len(targets)
+    return results, points, acc
+
+def draw_to_image(image, box_dict, dot_dict):
+#Plot targets
+    print(dot_dict)
+    print(box_dict)
+    for n, x in enumerate(box_dict["boxes"]):
+        if box_dict["labels"][n]:
+            cv2.rectangle(image, (int(x[0][0]),int(x[0][1])), (int(x[1][0]),int(x[1][1])), color=(0, 255, 0), thickness=2)
         else:
-            results['label'].append(False)
-    return results
+            cv2.rectangle(image, (int(x[0][0]),int(x[0][1])), (int(x[1][0]),int(x[1][1])), color=(255, 0, 0), thickness=2)
+            
+    for n, point in enumerate(dot_dict["points"]):
+        if dot_dict["labels"][n]:
+            cv2.circle(image, point, 10, (0,255,0), -1)
+        else:
+            cv2.circle(image, point, 10, (255,0,0), -1)
+    return image
 
 #Takes two coordinates of a box and a point and checks if the point lies inside
 def in_box(point, box):
@@ -322,7 +342,8 @@ def make_pred(model, img_batch, treshold):
     try:
         over_treshold = [pred_score.index(x) for x in pred_score if x>treshold][-1]
     except IndexError:
-        raise ValueError("No detection above threshold")
+        warnings.warn("Didn't detect anything over threshold %d" % treshold)
+        over_treshold = 0
     pred_boxes = pred_boxes[:over_treshold+1]
     pred_class = pred_class[:over_treshold+1]
     return pred_boxes, pred_score
