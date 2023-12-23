@@ -9,6 +9,7 @@ from albumentations.pytorch.transforms import ToTensorV2
 import re
 import matplotlib.pyplot as plt
 import warnings
+from tqdm import tqdm
 
 models = ["faster_rcnn_mobilenet", "faster_rcnn_resnet", "faster_rcnn_vgg", "retinanet_mobilenet", "retinanet_resnet", "retinanet_vgg"]
 
@@ -260,7 +261,7 @@ def test_model(model, data_loader, treshold = 0.9, plot = 0):
     model.eval()
     pic_count = 1
     accuracy_list = []
-    for images, targets, image_ids in data_loader:
+    for images, targets, image_ids in tqdm(data_loader):
         pred_boxes, pred_score = make_pred(model, images, treshold)
         
         #Extracting targets and images
