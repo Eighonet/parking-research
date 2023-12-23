@@ -305,8 +305,6 @@ def calculate_acc(targets, predicted):
 
 def draw_to_image(image, box_dict, dot_dict):
 #Plot targets
-    print(dot_dict)
-    print(box_dict)
     for n, x in enumerate(box_dict["boxes"]):
         if box_dict["labels"][n]:
             cv2.rectangle(image, (int(x[0][0]),int(x[0][1])), (int(x[1][0]),int(x[1][1])), color=(0, 255, 0), thickness=2)
@@ -322,7 +320,7 @@ def draw_to_image(image, box_dict, dot_dict):
 
 #Takes two coordinates of a box and a point and checks if the point lies inside
 def in_box(point, box):
-    if (point[0] > box[0][0] and point[1] < box[1][0]) and (point[1] > box[0][1] and point[1] < box[1][1]):
+    if (((point[0] > box[0][0]) and (point[0] < box[1][0])) and ((point[1] > box[0][1]) and (point[1] < box[1][1]))):
         return True
     else:
         False
