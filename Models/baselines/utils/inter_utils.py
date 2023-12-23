@@ -225,7 +225,7 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
             min_loss = loss_hist.value
         
         #Save every 10 epochs localy
-        if save_epoch == 10:
+        if save_epoch == 50:
             if "Saved_Models" not in os.listdir():
                 os.mkdir('Saved_Models')
             if str(experiment.get_name()) not in os.listdir('Saved_Models/'):
