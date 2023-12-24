@@ -103,18 +103,19 @@ class Averager:
         self.current_total = 0.0
         self.iterations = 0.0
 
+#From pytorch tutorial https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html
 def is_dist_avail_and_initialized():
     if not dist.is_available():
         return False
     if not dist.is_initialized():
         return False
     return True
-
+#From pytorch tutorial https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html
 def get_world_size():
     if not is_dist_avail_and_initialized():
         return 1
     return dist.get_world_size()
-
+#From pytorch tutorial https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html
 def reduce_dict(input_dict, average=True):
     """
     Args:
@@ -284,12 +285,12 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
         
         #Save every x epochs localy
         if save_epoch == settings["save_rate"]:
-            torch.save(model.state_dict(), os.path.join('Saved_Models/'+model, 'state_dict_'+str(epoch)+'.pth'))
+            torch.save(model.state_dict(), os.path.join('Saved_Models/'+ name, 'state_dict_'+str(epoch)+'.pth'))
             save_epoch = 0
         save_epoch +=1
         
     #Save after finishing training
-    torch.save(model.state_dict(), os.path.join('Saved_Models/'+str(experiment.get_name()),'state_dict_final'+'.pth')) ##Final save
+    torch.save(model.state_dict(), os.path.join('Saved_Models/'+name,'state_dict_final'+'.pth')) ##Final save
 
 def show_from_dataset(n, train_data_loader):
     i = 1
