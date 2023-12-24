@@ -226,7 +226,7 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
         
         #Progress bar
         loop.set_description(f"Epoch [{epoch}/{num_epochs}]")
-        loop.set_postfix(f"train loss: {loss_hist.value}, valid loss: {loss_hist_val.value}")
+        loop.set_postfix(loss = loss_hist.value, valid_loss = loss_hist_val.value)
         #print(f"Optimizer learning rate #{optimizer.param_groups[0]['lr']}")
           
         if loss_hist.value < min_loss:
