@@ -200,7 +200,7 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
         ##Validation
         with torch.no_grad():
             loss_hist_val.reset() #Resets to average just one epoch
-            for val_images, val_targets, val_image_ids in valid_data_loader:
+            for val_images, val_targets, val_image_ids in loop:
                 # if itr_val == 1:
                 #     for n, img in enumerate(val_images):
                 #         experiment.log_image(img, name = "Epoch {}, image {} in valid batch {}".format(epoch, n, itr_val), annotations = val_targets[n])   
@@ -226,7 +226,7 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
         
         #Progress bar
         loop.set_description(f"Epoch [{epoch}/{num_epochs}]")
-        loop.set_postfix(loss = loss_hist.value, valid_loss = loss_hist_val.value)
+        loop.set_postfix({"loss" : loss_hist.value, "valid_loss" : loss_hist_val.value})
         #print(f"Optimizer learning rate #{optimizer.param_groups[0]['lr']}")
           
         if loss_hist.value < min_loss:
