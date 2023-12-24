@@ -171,10 +171,10 @@ def get_dataframes(original_dataframe):
     
     original_dataframe[['x', 'y', 'w', 'h']] = np.stack(original_dataframe['bbox'].apply(lambda x: expand_bbox(x)))
     original_dataframe.drop(columns=['bbox'], inplace=True)
-    original_dataframe['x'] = original_dataframe['x'].astype(np.cfloat)
-    original_dataframe['y'] = original_dataframe['y'].astype(np.cfloat)
-    original_dataframe['w'] = original_dataframe['w'].astype(np.cfloat)
-    original_dataframe['h'] = original_dataframe['h'].astype(np.cfloat)
+    original_dataframe['x'] = original_dataframe['x'].astype(float)
+    original_dataframe['y'] = original_dataframe['y'].astype(float)
+    original_dataframe['w'] = original_dataframe['w'].astype(float)
+    original_dataframe['h'] = original_dataframe['h'].astype(float)
 
     train_df = original_dataframe[original_dataframe['folder'] == 'train']
     valid_df = original_dataframe[original_dataframe['folder'] == 'val']
@@ -191,10 +191,10 @@ def get_testDataframe(original_dataframe):
     
     original_dataframe[['x', 'y', 'w', 'h']] = np.stack(original_dataframe['bbox'].apply(lambda x: expand_bbox(x)))
     original_dataframe.drop(columns=['bbox'], inplace=True)
-    original_dataframe['x'] = original_dataframe['x'].astype(np.cfloat)
-    original_dataframe['y'] = original_dataframe['y'].astype(np.cfloat)
-    original_dataframe['w'] = original_dataframe['w'].astype(np.cfloat)
-    original_dataframe['h'] = original_dataframe['h'].astype(np.cfloat)
+    original_dataframe['x'] = original_dataframe['x'].astype(float)
+    original_dataframe['y'] = original_dataframe['y'].astype(float)
+    original_dataframe['w'] = original_dataframe['w'].astype(float)
+    original_dataframe['h'] = original_dataframe['h'].astype(float)
 
     test_df = original_dataframe[original_dataframe['folder'] == 'test']
     
@@ -399,7 +399,7 @@ def make_pred(model, img_batch, treshold):
     try:
         over_treshold = [pred_score.index(x) for x in pred_score if x>treshold][-1]
     except IndexError:
-        warnings.warn("Didn't detect anything over threshold %d" % treshold)
+        warnings.warn(f"Didn't detect anything over threshold {treshold}")
         over_treshold = 0
     pred_boxes = pred_boxes[:over_treshold+1]
     pred_class = pred_class[:over_treshold+1]
