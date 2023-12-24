@@ -97,14 +97,14 @@ train_data_loader = DataLoader(
     train_dataset,
     batch_size=settings["batch_size"],
     shuffle=False,
-    num_workers=4,
+    num_workers=5,
     collate_fn=collate_fn
 )
 valid_data_loader = DataLoader(
     valid_dataset,
     batch_size=settings["batch_size"],
     shuffle=False,
-    num_workers=4,
+    num_workers=5,
     collate_fn=collate_fn
 )
 
