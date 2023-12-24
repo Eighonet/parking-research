@@ -177,9 +177,10 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
 
     for epoch in range(num_epochs):
         loss_hist.reset() #Resets to average just one epoch
-        loop = tqdm(train_data_loader) #Init progress bar
+        train_loop = tqdm(train_data_loader) #Init progress bar
+        train_loop.set_description(f"Epoch [{epoch}/{num_epochs}]")
         
-        for images, targets, image_ids in loop:
+        for images, targets, image_ids in train_loop:
 
             images = list(image.to(device) for image in images)
             targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
@@ -196,11 +197,13 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
             losses.backward()
             optimizer.step()
             itr += 1
+        train_loop.set_postfix(train_loss = loss_hist.value)
         
         ##Validation
+        valid_loop = tqdm(valid_data_loader)
         with torch.no_grad():
             loss_hist_val.reset() #Resets to average just one epoch
-            for val_images, val_targets, val_image_ids in loop:
+            for val_images, val_targets, val_image_ids in valid_loop:
                 # if itr_val == 1:
                 #     for n, img in enumerate(val_images):
                 #         experiment.log_image(img, name = "Epoch {}, image {} in valid batch {}".format(epoch, n, itr_val), annotations = val_targets[n])   
@@ -225,8 +228,7 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
         #scheduler.step()
         
         #Progress bar
-        loop.set_description(f"Epoch [{epoch}/{num_epochs}]")
-        loop.set_postfix({"loss" : loss_hist.value, "valid_loss" : loss_hist_val.value})
+        valid_loop.set_postfix(valid_loss = loss_hist_val.value)
         #print(f"Optimizer learning rate #{optimizer.param_groups[0]['lr']}")
           
         if loss_hist.value < min_loss:
