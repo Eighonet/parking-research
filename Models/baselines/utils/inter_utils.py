@@ -102,6 +102,32 @@ class Averager:
         self.current_total = 0.0
         self.iterations = 0.0
 
+def reduce_dict(input_dict, average=True):
+    """
+    Args:
+        input_dict (dict): all the values will be reduced
+        average (bool): whether to do average or sum
+    Reduce the values in the dictionary from all processes so that all processes
+    have the averaged results. Returns a dict with the same fields as
+    input_dict, after reduction.
+    """
+    world_size = get_world_size()
+    if world_size < 2:
+        return input_dict
+    with torch.inference_mode():
+        names = []
+        values = []
+        # sort the keys so that they are consistent across processes
+        for k in sorted(input_dict.keys()):
+            names.append(k)
+            values.append(input_dict[k])
+        values = torch.stack(values, dim=0)
+        dist.all_reduce(values)
+        if average:
+            values /= world_size
+        reduced_dict = {k: v for k, v in zip(names, values)}
+    return reduced_dict
+
 def get_train_transform(add_augmentations=False, augmentation_list=[]):
     if add_augmentations:
         return A.Compose(augmentation_list, bbox_params={'format': 'pascal_voc', 'label_fields': ['labels']})
@@ -188,7 +214,10 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
             loss_dict = model(images, targets)
 
             losses = sum(loss for loss in loss_dict.values())
-            loss_value = losses.item()
+            
+            loss_dict_reduced = reduce_dict(loss_dict)
+            losses_reduced = sum(loss for loss in loss_dict_reduced.values())
+            loss_value = losses_reduced.item()
             
             experiment.log_metric("training batch loss", loss_value, step = itr)
             loss_hist.send(loss_value)
@@ -196,8 +225,8 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
             optimizer.zero_grad()
             losses.backward()
             optimizer.step()
+            train_loop.set_postfix(train_loss = loss_hist.value)
             itr += 1
-        train_loop.set_postfix(train_loss = loss_hist.value)
         
         ##Validation
         valid_loop = tqdm(valid_data_loader)
@@ -215,20 +244,24 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
                 val_loss_dict = model(val_images, val_targets)  
 
                 val_losses = sum(val_loss for val_loss in val_loss_dict.values())
-                val_loss_value = val_losses.item()
+                
+                val_loss_dict_reduced = reduce_dict(val_loss_dict)
+                val_losses_reduced = sum(loss for loss in val_loss_dict_reduced.values())
+                val_loss_value = val_losses_reduced.item()
                 
                 experiment.log_metric("validation batch loss", val_loss_value, step = itr_val)
                 loss_hist_val.send(val_loss_value)
+                #Progress bar
+                valid_loop.set_postfix(valid_loss = loss_hist_val.value)
                 itr_val += 1
                 
         experiment.log_metric("epoch average loss", loss_hist.value, epoch = epoch)
         experiment.log_metric("epoch average validation loss", loss_hist_val.value, epoch = epoch)
         experiment.log_epoch_end(epoch)
         experiment.log_metric("optim learning rate", optimizer.param_groups[0]["lr"], epoch = epoch)
-        #scheduler.step()
+        scheduler.step()
         
-        #Progress bar
-        valid_loop.set_postfix(valid_loss = loss_hist_val.value)
+        
         #print(f"Optimizer learning rate #{optimizer.param_groups[0]['lr']}")
           
         if loss_hist.value < min_loss:
