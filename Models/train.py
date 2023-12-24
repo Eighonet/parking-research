@@ -55,8 +55,10 @@ seed_everything(settings["seed"])
 #Get wanted model from inter models 
 if settings["model_type"] == 'faster_rcnn_mobilenet':
     model = get_model(faster_rcnn_mobilenet_params)
-elif settings["model_type"] == 'faster_rcnn_mobilenetV3':
-    model = get_model(faster_rcnn_mobilenetV3_params)
+elif settings["model_type"] == 'faster_rcnn_mobilenetV3_large':
+    model = get_model(faster_rcnn_mobilenetV3_Large_params)
+elif settings["model_type"] == 'faster_rcnn_mobilenetV3_small':
+    model = get_model(faster_rcnn_mobilenetV3_Small_params)
 elif settings["model_type"] == 'faster_rcnn_resnet':
     model = get_model(faster_rcnn_resnet_params)
 elif settings["model_type"] == 'faster_rcnn_vgg':
@@ -113,7 +115,7 @@ params = [p for p in model.parameters() if p.requires_grad]
 #SGD
 #optimizer = torch.optim.SGD(params, lr=settings["learning_rate"], momentum=0.9, weight_decay=0.0005)
 #Adam
-optimizer = torch.optim.Adam(params, lr=settings["learning_rate"], weight_decay=0.0005)
+optimizer = torch.optim.Adam(params, lr=settings["learning_rate"], weight_decay=0.001)
 
 #lr_scheduler_increase = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=10.0)
 lr_scheduler_decrease = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)

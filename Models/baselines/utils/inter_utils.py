@@ -12,7 +12,7 @@ import warnings
 from tqdm import tqdm
 import torch.distributed as dist
 
-models = ["faster_rcnn_mobilenet", "faster_rcnn_mobilenetV3", "faster_rcnn_resnet", "faster_rcnn_vgg", "retinanet_mobilenet", "retinanet_resnet", "retinanet_vgg"]
+models = ["faster_rcnn_mobilenet", "faster_rcnn_mobilenetV3_large", "faster_rcnn_mobilenetV3_small", "faster_rcnn_resnet", "faster_rcnn_vgg", "retinanet_mobilenet", "retinanet_resnet", "retinanet_vgg"]
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Interference training settings")
