@@ -10,6 +10,7 @@ import re
 import matplotlib.pyplot as plt
 import warnings
 from tqdm import tqdm
+import torch.distributed as dist
 
 models = ["faster_rcnn_mobilenet", "faster_rcnn_mobilenetV3", "faster_rcnn_resnet", "faster_rcnn_vgg", "retinanet_mobilenet", "retinanet_resnet", "retinanet_vgg"]
 
@@ -101,6 +102,18 @@ class Averager:
     def reset(self):
         self.current_total = 0.0
         self.iterations = 0.0
+
+def is_dist_avail_and_initialized():
+    if not dist.is_available():
+        return False
+    if not dist.is_initialized():
+        return False
+    return True
+
+def get_world_size():
+    if not is_dist_avail_and_initialized():
+        return 1
+    return dist.get_world_size()
 
 def reduce_dict(input_dict, average=True):
     """
