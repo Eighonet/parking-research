@@ -245,6 +245,7 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
         
         ##Validation
         valid_loop = tqdm(valid_data_loader)
+        valid_loop.set_description(f"Epoch [{epoch}/{num_epochs}]")
         with torch.no_grad():
             loss_hist_val.reset() #Resets to average just one epoch
             for val_images, val_targets, val_image_ids in valid_loop:
