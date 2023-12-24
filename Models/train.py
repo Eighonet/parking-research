@@ -113,7 +113,7 @@ params = [p for p in model.parameters() if p.requires_grad]
 #SGD
 #optimizer = torch.optim.SGD(params, lr=settings["learning_rate"], momentum=0.9, weight_decay=0.0005)
 #Adam
-optimizer = torch.optim.Adam(params, lr=settings["learning_rate"], weight_decay=0.01)
+optimizer = torch.optim.Adam(params, lr=settings["learning_rate"], weight_decay=0.0005)
 
 #lr_scheduler_increase = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=10.0)
 lr_scheduler_decrease = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
