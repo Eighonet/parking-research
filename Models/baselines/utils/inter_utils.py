@@ -212,8 +212,8 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
     #Creating saving directory
     if "Saved_Models" not in os.listdir():
         os.mkdir('Saved_Models')
-        if name not in os.listdir('Saved_Models/'):
-            os.mkdir('Saved_Models/'+ name)
+    if name not in os.listdir('Saved_Models/'):
+        os.mkdir('Saved_Models/'+ name)
 
     for epoch in range(num_epochs):
         loss_hist.reset() #Resets to average just one epoch
