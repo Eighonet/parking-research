@@ -68,8 +68,6 @@ def get_model(model_params):
     if model_params['model'] == 'FasterRCNN':
         model = FasterRCNN(backbone=backbone,
                             num_classes=2,
-                            min_size=min_size,
-                            max_size=max_size, 
                             image_mean=mean, 
                             image_std=std,
                             rpn_anchor_generator = new_anchor_generator,
