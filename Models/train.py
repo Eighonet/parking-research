@@ -44,7 +44,8 @@ settings = {
     "path" : "datasets/"+str(dataset)+'/'+str(dataset)+'/',
     "model_type" : args.model,
     "seed" : int(datetime.now().timestamp()),
-    "save_rate" : args.saveRate
+    "save_rate" : args.saveRate,
+    "pretrained" : args.pretrained
 }
 experiment.log_parameters(settings)
 experiment.log_dataset_info(dataset, path = settings["path"])
@@ -54,6 +55,8 @@ seed_everything(settings["seed"])
 #Get wanted model from inter models 
 if settings["model_type"] == 'faster_rcnn_mobilenet':
     model = get_model(faster_rcnn_mobilenet_params)
+elif settings["model_type"] == 'faster_rcnn_mobilenetV3':
+    model = get_model(faster_rcnn_mobilenetV3_params)
 elif settings["model_type"] == 'faster_rcnn_resnet':
     model = get_model(faster_rcnn_resnet_params)
 elif settings["model_type"] == 'faster_rcnn_vgg':

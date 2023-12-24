@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import warnings
 from tqdm import tqdm
 
-models = ["faster_rcnn_mobilenet", "faster_rcnn_resnet", "faster_rcnn_vgg", "retinanet_mobilenet", "retinanet_resnet", "retinanet_vgg"]
+models = ["faster_rcnn_mobilenet", "faster_rcnn_mobilenetV3", "faster_rcnn_resnet", "faster_rcnn_vgg", "retinanet_mobilenet", "retinanet_resnet", "retinanet_vgg"]
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Interference training settings")
@@ -23,6 +23,7 @@ def parse_args():
     parser.add_argument('-b', '--batch', type=int, help="Size of img batch", default = 4)
     parser.add_argument('-r', '--rate', type=float, help="Learning rate", default = 0.01)
     parser.add_argument('--saveRate', type=int, help="Save every x epochs", default = 20)
+    parser.add_argument('-t', '--pretrained', type=bool, help="Load model with pretrained weights")
     
     args = parser.parse_args()
     return args

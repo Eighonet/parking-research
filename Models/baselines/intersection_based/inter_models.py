@@ -15,6 +15,10 @@ faster_rcnn_mobilenet_params = {'backbone': 'mobilenet_v2',
                                 'out_channels': 1280,
                                 'model': 'FasterRCNN'}
 
+faster_rcnn_mobilenetV3_params = {'backbone' : 'mobilenet_v3_large',
+                                  'out_channels': 1280,
+                                  'model': 'FasterRCNN'}
+
 faster_rcnn_resnet_params = {'backbone': 'resnet50',
                                 'out_channels': 2048,
                                 'model': 'FasterRCNN'}
@@ -64,8 +68,8 @@ def get_model(model_params):
 
     if model_params['model'] == 'FasterRCNN':
         model = FasterRCNN(backbone=backbone,
-                            num_classes=2, 
-                            min_size=min_size, 
+                            num_classes=2,
+                            min_size=min_size,
                             max_size=max_size, 
                             image_mean=mean, 
                             image_std=std,
