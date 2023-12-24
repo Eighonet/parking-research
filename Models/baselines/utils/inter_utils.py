@@ -221,6 +221,14 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
         train_loop = tqdm(train_data_loader) #Init progress bar
         train_loop.set_description(f"Epoch [{epoch}/{num_epochs}]")
         
+        #Learning rate scheduler for first epoch
+        if epoch == 0:
+            warmup = 1.0 / 1000
+            warmup_iters = min(1000, len(train_data_loader) - 1)
+            warmup_scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=warmup, total_iters= warmup_iters)
+        else:
+            warmup_scheduler = 0
+        
         for images, targets, image_ids in train_loop:
 
             images = list(image.to(device) for image in images)
@@ -240,6 +248,8 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
             optimizer.zero_grad()
             losses.backward()
             optimizer.step()
+            if warmup_scheduler:
+                warmup_scheduler.step()
             train_loop.set_postfix(train_loss = loss_hist.value)
             itr += 1
         
@@ -275,15 +285,8 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
         experiment.log_metric("epoch average validation loss", loss_hist_val.value, epoch = epoch)
         experiment.log_epoch_end(epoch)
         experiment.log_metric("optim learning rate", optimizer.param_groups[0]["lr"], epoch = epoch)
-        scheduler.step()
-        
-        
-        #print(f"Optimizer learning rate #{optimizer.param_groups[0]['lr']}")
+        scheduler.step() # Stepping the scheduler to next epoch
           
-        if loss_hist.value < min_loss:
-            print(f"Epoch #{epoch} is best")
-            min_loss = loss_hist.value
-        
         #Save every x epochs localy
         if save_epoch == settings["save_rate"]:
             torch.save(model.state_dict(), os.path.join('Saved_Models/'+ name, 'state_dict_'+str(epoch)+'.pth'))
