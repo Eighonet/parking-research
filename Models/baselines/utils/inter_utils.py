@@ -194,12 +194,13 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
     loss_hist = Averager()
     loss_hist_val = Averager()
     min_loss = -np.inf
+    name = experiment.get_name()
     
     #Creating saving directory
     if "Saved_Models" not in os.listdir():
         os.mkdir('Saved_Models')
-        if str(experiment.get_name()) not in os.listdir('Saved_Models/'):
-            os.mkdir('Saved_Models/'+ str(experiment.get_name()))
+        if name not in os.listdir('Saved_Models/'):
+            os.mkdir('Saved_Models/'+ name)
 
     for epoch in range(num_epochs):
         loss_hist.reset() #Resets to average just one epoch
@@ -270,7 +271,7 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
         
         #Save every x epochs localy
         if save_epoch == settings["save_rate"]:
-            torch.save(model.state_dict(), os.path.join('Saved_Models/'+str(experiment.get_name()),'state_dict_'+str(epoch)+'.pth'))
+            torch.save(model.state_dict(), os.path.join('Saved_Models/'+model, 'state_dict_'+str(epoch)+'.pth'))
             save_epoch = 0
         save_epoch +=1
         
