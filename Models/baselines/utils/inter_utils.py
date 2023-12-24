@@ -177,8 +177,9 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
 
     for epoch in range(num_epochs):
         loss_hist.reset() #Resets to average just one epoch
+        loop = tqdm(train_data_loader) #Init progress bar
         
-        for images, targets, image_ids in train_data_loader:
+        for images, targets, image_ids in loop:
 
             images = list(image.to(device) for image in images)
             targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
@@ -223,8 +224,9 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
         experiment.log_metric("optim learning rate", optimizer.param_groups[0]["lr"], epoch = epoch)
         #scheduler.step()
         
-        print(f"Epoch #{epoch} train loss: {loss_hist.value}")
-        print(f"Epoch #{epoch} valid loss: {loss_hist_val.value}\n")  
+        #Progress bar
+        loop.set_description(f"Epoch [{epoch}/{num_epochs}]")
+        loop.set_postfix(f"train loss: {loss_hist.value}, valid loss: {loss_hist_val.value}")
         #print(f"Optimizer learning rate #{optimizer.param_groups[0]['lr']}")
           
         if loss_hist.value < min_loss:
