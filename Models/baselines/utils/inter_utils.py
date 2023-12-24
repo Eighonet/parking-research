@@ -22,7 +22,7 @@ def parse_args():
     parser.add_argument('-s', '--saved', type=str, help="Path to saved model to retrain on new dataset", default = None)
     parser.add_argument('-n', '--name', type=str, help="Name of experiment in comet", default = None)
     parser.add_argument('-b', '--batch', type=int, help="Size of img batch", default = 4)
-    parser.add_argument('-r', '--rate', type=float, help="Learning rate", default = 0.005)
+    parser.add_argument('-r', '--rate', type=float, help="Learning rate", default = 0.001)
     parser.add_argument('--saveRate', type=int, help="Save every x epochs", default = 20)
     parser.add_argument('-t', '--pretrained', type=bool, help="Load model with pretrained weights")
     
@@ -200,7 +200,7 @@ def get_testDataframe(original_dataframe):
     
     return test_df
 
-def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, device, experiment, settings, optimizer, scheduler):
+def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, device, experiment, settings, optimizer, scheduler = 0):
     model.train()
     itr = 0
     itr_val = 0
@@ -285,7 +285,8 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
         experiment.log_metric("epoch average validation loss", loss_hist_val.value, epoch = epoch)
         experiment.log_epoch_end(epoch)
         experiment.log_metric("optim learning rate", optimizer.param_groups[0]["lr"], epoch = epoch)
-        scheduler.step() # Stepping the scheduler to next epoch
+        if scheduler:
+            scheduler.step() # Stepping the scheduler to next epoch
           
         #Save every x epochs localy
         if save_epoch == settings["save_rate"]:

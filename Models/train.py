@@ -115,11 +115,11 @@ params = [p for p in model.parameters() if p.requires_grad]
 #SGD
 #optimizer = torch.optim.SGD(params, lr=settings["learning_rate"], momentum=0.9, weight_decay=0.0005)
 #Adam
-optimizer = torch.optim.Adam(params, lr=settings["learning_rate"], weight_decay=0.001)
+optimizer = torch.optim.Adam(params, lr=settings["learning_rate"], weight_decay=0.01)
 
 #lr_scheduler_increase = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=10.0)
 lr_scheduler_decrease = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
 
-train_inter_model(model, settings["epochs"], train_data_loader, valid_data_loader, device, experiment, settings, optimizer, lr_scheduler_decrease)
+train_inter_model(model, settings["epochs"], train_data_loader, valid_data_loader, device, experiment, settings, optimizer, scheduler=lr_scheduler_decrease)
 #Save model to comet for inference
 log_model(experiment, model, model_name=settings["model_type"])
