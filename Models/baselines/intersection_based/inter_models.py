@@ -15,8 +15,12 @@ faster_rcnn_mobilenet_params = {'backbone': 'mobilenet_v2',
                                 'out_channels': 1280,
                                 'model': 'FasterRCNN'}
 
-faster_rcnn_mobilenetV3_params = {'backbone' : 'mobilenet_v3_large',
+faster_rcnn_mobilenetV3_Large_params = {'backbone' : 'mobilenet_v3_large',
                                   'out_channels': 960,
+                                  'model': 'FasterRCNN'}
+
+faster_rcnn_mobilenetV3_Small_params = {'backbone' : 'mobilenet_v3_small',
+                                  'out_channels': 576,
                                   'model': 'FasterRCNN'}
 
 faster_rcnn_resnet_params = {'backbone': 'resnet50',
