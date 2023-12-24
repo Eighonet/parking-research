@@ -59,8 +59,7 @@ def get_model(model_params):
     if model_params['backbone'] == 'vgg19':
         backbone = torchvision.models.vgg19(weights = VGG19_Weights.DEFAULT).features
     
-    if model_params['backbone']:
-        backbone.out_channels = model_params['out_channels']
+    backbone.out_channels = model_params['out_channels']
 
     new_anchor_generator = AnchorGenerator(sizes=((32, 64, 128, 256, 512),), 
                                         aspect_ratios=((0.5, 1.0, 2.0),))
