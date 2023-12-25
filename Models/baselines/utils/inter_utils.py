@@ -232,7 +232,8 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
             warmup_scheduler = 0
         
         for images, targets, image_ids in train_loop:
-
+            
+            #Send image to device (would cause problem if it were missing on GPU)
             images = list(image.to(device) for image in images)
             targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
@@ -266,6 +267,7 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
                 #         experiment.log_image(img, name = "Epoch {}, image {} in valid batch {}".format(epoch, n, itr_val), annotations = val_targets[n])   
                 # itr_val += 1
                 
+                #Send image to device (would cause problem if it were missing on GPU)
                 val_images = list(val_image.to(device) for val_image in val_images)
                 val_targets = [{val_k: val_v.to(device) for val_k, val_v in val_t.items()} for val_t in val_targets]
 
@@ -318,13 +320,13 @@ def show_from_dataset(n, train_data_loader):
     plt.axis("off")
 
 #Takes only one image not a batch!!
-def test_model(model, data_loader, treshold = 0.9, plot = 0, save = False):
+def test_model(model, device, data_loader, treshold = 0.9, plot = 0, save = False):
     model.eval()
     pic_count = 1
     accuracy_list = []
     loop = tqdm(data_loader)
     for images, targets, image_ids in loop:
-        pred_boxes, pred_score = make_pred(model, images, treshold)
+        pred_boxes, pred_score = make_pred(model, device, images, treshold)
         
         #Extracting targets and images
         image = images[0].detach().permute(1,2,0).numpy()
@@ -394,7 +396,7 @@ def in_box(point, box):
         return True
     else:
         False
- 
+#Load an existin model dict
 def load_model(model, device, path):
     if device.type == 'cpu':
         model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
@@ -402,7 +404,10 @@ def load_model(model, device, path):
         model.load_state_dict(torch.load(path))
         model.cuda()
 
-def make_pred(model, img_batch, treshold):
+def make_pred(model,device, img_batch, treshold):
+    #Send image to device (would cause problem if it were missing on GPU)
+    images = list(image.to(device) for image in images)
+    targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
     pred = model(img_batch)
     pred_boxes = [[(x[0], x[1]), (x[2], x[3])] for x in list(pred[0]["boxes"].detach().numpy())]
     pred_class = list(pred[0]["labels"].detach().numpy())
