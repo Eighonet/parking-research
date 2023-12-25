@@ -99,17 +99,17 @@ def get_model(model_params, pretrain = False):
             model.roi_heads.box_predictor = faster_rcnn.FastRCNNPredictor(in_features, 2)
         elif model_params['model'] == 'RetinaNet':
             if model_params['backbone'] == 'resnet50':
-                model = torchvision.models.detection.retinanet_resnet50_fpn_v2(weight = "DEFAULT")
-                #Changing classification layer to classify 2 classes only
-                in_features = model.head.classification_head.conv[0].in_channels
-                num_anchors = model.head.classification_head.num_anchors
-                model.head.classification_head.num_classes = 2
-                cls_logits = torch.nn.Conv2d(2048, num_anchors * 2, kernel_size = 3, stride=1, padding=1)
-                #Pytorch documentation code
-                torch.nn.init.normal_(cls_logits.weight, std=0.01)
-                torch.nn.init.constant_(cls_logits.bias, -math.log((1 - 0.01) / 0.01))
-                #Asssign the classification layer back to model
-                model.head.classification_head.cls_logits = cls_logits
+                model = torchvision.models.detection.retinanet_resnet50_fpn_v2(weight = "DEFAULT", num_classes = 2)
+                # #Changing classification layer to classify 2 classes only
+                # in_features = model.head.classification_head.conv[0].in_channels
+                # num_anchors = model.head.classification_head.num_anchors
+                # model.head.classification_head.num_classes = 2
+                # cls_logits = torch.nn.Conv2d(2048, num_anchors * 2, kernel_size = 3, stride=1, padding=1)
+                # #Pytorch documentation code
+                # torch.nn.init.normal_(cls_logits.weight, std=0.01)
+                # torch.nn.init.constant_(cls_logits.bias, -math.log((1 - 0.01) / 0.01))
+                # #Asssign the classification layer back to model
+                # model.head.classification_head.cls_logits = cls_logits
 
             raise ValueError("Pretrained for RetinaNet not implemented yet")
     return model
