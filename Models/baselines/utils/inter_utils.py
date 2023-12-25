@@ -221,7 +221,7 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
     for epoch in range(num_epochs):
         loss_hist.reset() #Resets to average just one epoch
         train_loop = tqdm(train_data_loader) #Init progress bar
-        train_loop.set_description(f"Epoch [{epoch}/{num_epochs}]")
+        train_loop.set_description(f"Epoch [{epoch}/{num_epochs-1}]")
         
         #Learning rate scheduler for first epoch
         if epoch == 0 and warmup:
@@ -257,7 +257,7 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
         
         ##Validation
         valid_loop = tqdm(valid_data_loader)
-        valid_loop.set_description(f"Epoch [{epoch}/{num_epochs}]")
+        valid_loop.set_description(f"Epoch [{epoch}/{num_epochs-1}]")
         with torch.no_grad():
             loss_hist_val.reset() #Resets to average just one epoch
             for val_images, val_targets, val_image_ids in valid_loop:
