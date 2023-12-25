@@ -407,8 +407,8 @@ def load_model(model, device, path):
 def make_pred(model, device, img_batch, treshold):
     #Send image to device (would cause problem if it were missing on GPU)
     images = list(image.to(device) for image in img_batch)
-    targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
-    pred = model(images)
+    with torch.no_grad():
+        pred = model(images)
     pred_boxes = [[(x[0], x[1]), (x[2], x[3])] for x in list(pred[0]["boxes"].detach().numpy())]
     pred_class = list(pred[0]["labels"].detach().numpy())
     pred_score = list(pred[0]["scores"].detach().numpy())
