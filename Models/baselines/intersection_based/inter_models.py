@@ -1,8 +1,6 @@
 from torchvision.ops import MultiScaleRoIAlign
 from torchvision.models.detection.rpn import AnchorGenerator
 from torchvision.models.detection import FasterRCNN, RetinaNet, faster_rcnn, retinanet
-#from torchvision.models import ResNet50_Weights, MobileNet_V2_Weights, MobileNet_V3_Small_Weights, MobileNet_V3_Large_Weights, VGG19_Weights
-from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 import torchvision
 import torch
 

@@ -1,16 +1,12 @@
 import comet_ml
-import sys
 from baselines.intersection_based.inter_models import *
 from baselines.utils.common_utils import seed_everything, get_device
 from baselines.utils.inter_utils import *
 import pandas as pd
 import os
 import torch
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader
 device = get_device()
-import warnings
-warnings.filterwarnings("ignore")
-import matplotlib.pyplot as plt
 from comet_ml.integration.pytorch import log_model
 from datetime import datetime
 args = parse_args()
