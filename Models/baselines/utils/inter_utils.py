@@ -326,8 +326,8 @@ def test_model(model, device, data_loader, treshold = 0.9, plot = 0, save = Fals
     accuracy_list = []
     loop = tqdm(data_loader)
     t_measured = 0
-    for images, targets, image_ids in loop:
-        if timeit and not t_measured:
+    for n, images, targets, image_ids in enumerate(loop):
+        if timeit and not t_measured and n == 1:
             tic = time.perf_counter()
         pred_boxes, pred_score = make_pred(model, device, images, treshold)
         if timeit and not t_measured:
@@ -358,7 +358,7 @@ def test_model(model, device, data_loader, treshold = 0.9, plot = 0, save = Fals
             image *=255
             cv2.imwrite(f"testing_result/{image_id}", image)
     if timeit:
-        print(f"Time of one inference: {t_measured}s")
+        print(f"Time of one inference: {t_measured:0.4f} s")
     return accuracy_list
 
 def calculate_acc(targets, predicted):
