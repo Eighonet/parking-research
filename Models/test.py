@@ -12,6 +12,7 @@ parser.add_argument("-m", "--model", type=str, help="Path to a model to test")
 parser.add_argument("-t", "--type", type=str, choices=models ,help="Type of a model to test")
 parser.add_argument("--pretrained", type=bool, help="Was the model pretrained?", default=False)
 parser.add_argument("-s", "--save", type=bool, help="Export prediciton images", default=False)
+parser.add_argument("--timeit", type=bool, help="Time one inference")
 args = parser.parse_args()
 
 warnings.filterwarnings("ignore")
@@ -57,6 +58,6 @@ test_data_loader = DataLoader(
     collate_fn=collate_fn
 )
 #show_from_dataset(2, test_data_loader)
-acc_list = test_model(model, device, test_data_loader, 0.85, save=args.save)
+acc_list = test_model(model, device, test_data_loader, 0.85, save=args.save, timeit=args.timeit)
 avg_acc = sum(acc_list) / len(acc_list)
 print("Average accuracy on test dataset: %0.2f %%" %(avg_acc*100))

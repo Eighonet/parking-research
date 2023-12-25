@@ -320,13 +320,19 @@ def show_from_dataset(n, train_data_loader):
     plt.axis("off")
 
 #Takes only one image not a batch!!
-def test_model(model, device, data_loader, treshold = 0.9, plot = 0, save = False):
+def test_model(model, device, data_loader, treshold = 0.9, plot = 0, save = False, timeit = False):
     model.eval()
     pic_count = 1
     accuracy_list = []
     loop = tqdm(data_loader)
+    t_measured = 0
     for images, targets, image_ids in loop:
+        if timeit and not t_measured:
+            tic = time.perf_counter()
         pred_boxes, pred_score = make_pred(model, device, images, treshold)
+        if timeit and not t_measured:
+            toc = time.perf_counter()
+            t_measured = toc-tic
         
         #Extracting targets and images
         image = images[0].detach().permute(1,2,0).numpy()
@@ -351,6 +357,8 @@ def test_model(model, device, data_loader, treshold = 0.9, plot = 0, save = Fals
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
             image *=255
             cv2.imwrite(f"testing_result/{image_id}", image)
+        if timeit:
+            print(f"Time of one inference: {t_measured}s")
     return accuracy_list
 
 def calculate_acc(targets, predicted):
