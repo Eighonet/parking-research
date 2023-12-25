@@ -11,6 +11,7 @@ parser.add_argument("-d", "--dataset", type=str, help="Name of a dataset located
 parser.add_argument("-m", "--model", type=str, help="Path to a model to test")
 parser.add_argument("-t", "--type", type=str, choices=models ,help="Type of a model to test")
 parser.add_argument("--pretrained", type=bool, help="Was the model pretrained?", default=False)
+parser.add_argument("-s", "--save", type=bool, help="Export prediciton images", default=False)
 args = parser.parse_args()
 
 warnings.filterwarnings("ignore")
@@ -52,10 +53,10 @@ test_dataset = ParkDataset(test_df, DIR_TEST, get_valid_transform())
 test_data_loader = DataLoader(
     test_dataset,
     shuffle=False,
-    #num_workers=4,
+    num_workers=4,
     collate_fn=collate_fn
 )
 #show_from_dataset(2, test_data_loader)
-acc_list = test_model(model, test_data_loader, 0.5)
+acc_list = test_model(model, test_data_loader, 0.5, save=args.save)
 avg_acc = sum(acc_list) / len(acc_list)
 print("Average accuracy on test dataset: %0.2f %%" %(avg_acc*100))
