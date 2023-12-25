@@ -116,6 +116,6 @@ optimizer = torch.optim.Adam(params, lr=settings["learning_rate"], weight_decay=
 #lr_scheduler_increase = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=10.0)
 lr_scheduler_decrease = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
 
-train_inter_model(model, settings["epochs"], train_data_loader, valid_data_loader, device, experiment, settings, optimizer, scheduler=0)
+train_inter_model(model, settings["epochs"], train_data_loader, valid_data_loader, device, experiment, settings, optimizer, scheduler=0, warmup=args.warmup)
 #Save model to comet for inference
 log_model(experiment, model, model_name=settings["model_type"])

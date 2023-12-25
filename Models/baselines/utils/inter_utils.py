@@ -25,6 +25,7 @@ def parse_args():
     parser.add_argument('-r', '--rate', type=float, help="Learning rate", default = 0.001)
     parser.add_argument('--saveRate', type=int, help="Save every x epochs", default = 20)
     parser.add_argument('-t', '--pretrained', type=bool, help="Load model with pretrained weights")
+    parser.add_argument('-w', '--warmup', type=bool, help="Use warming up scheduler for the first epoch (recommended when training on a new dataset)")
     
     args = parser.parse_args()
     return args
@@ -200,7 +201,7 @@ def get_testDataframe(original_dataframe):
     
     return test_df
 
-def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, device, experiment, settings, optimizer, scheduler = 0):
+def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, device, experiment, settings, optimizer, scheduler = 0, warmup = True):
     model.train()
     itr = 0
     itr_val = 0
@@ -222,10 +223,10 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
         train_loop.set_description(f"Epoch [{epoch}/{num_epochs}]")
         
         #Learning rate scheduler for first epoch
-        if epoch == 0:
-            warmup = 1.0 / 1000
+        if epoch == 0 and warmup:
+            warmup_lr = 1.0 / 1000
             warmup_iters = min(1000, len(train_data_loader) - 1)
-            warmup_scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=warmup, total_iters= warmup_iters)
+            warmup_scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=warmup_lr, total_iters= warmup_iters)
         else:
             warmup_scheduler = 0
         
