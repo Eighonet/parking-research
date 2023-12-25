@@ -62,7 +62,7 @@ def get_model(model_params, pretrain = False):
             modules = list(model.children())[:-1]
             backbone = torch.nn.Sequential(*modules)
         else:
-            backbone = model.features
+            backbone = model
             
         backbone.out_channels = model_params['out_channels']
         new_anchor_generator = AnchorGenerator(sizes=((32, 64, 128, 256, 512),), 
