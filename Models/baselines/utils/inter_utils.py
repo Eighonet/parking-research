@@ -328,10 +328,10 @@ def test_model(model, device, data_loader, treshold = 0.9, plot = 0, save = Fals
     t_measured = 0
     n = 0
     for images, targets, image_ids in loop:
-        if timeit and (not t_measured) and n == 1:
+        if timeit and n == 1:
             tic = time.perf_counter()
         pred_boxes, pred_score = make_pred(model, device, images, treshold)
-        if timeit and not t_measured:
+        if timeit and n == 1:
             toc = time.perf_counter()
             t_measured = toc-tic
         
