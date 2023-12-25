@@ -111,5 +111,5 @@ def get_model(model_params, pretrain = False):
                 # #Asssign the classification layer back to model
                 # model.head.classification_head.cls_logits = cls_logits
 
-            raise ValueError("Pretrained for RetinaNet not implemented yet")
+            #raise ValueError("Pretrained for RetinaNet not implemented yet")
     return model
