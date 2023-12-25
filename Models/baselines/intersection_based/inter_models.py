@@ -3,6 +3,7 @@ from torchvision.models.detection.rpn import AnchorGenerator
 from torchvision.models.detection import FasterRCNN, RetinaNet, faster_rcnn, retinanet
 import torchvision
 import torch
+import math
 
 
 min_size = 300
@@ -46,15 +47,15 @@ retinanet_vgg_params = {'backbone': 'vgg19',
 def get_model(model_params, pretrain = False):
     if not pretrain:
         if model_params['backbone'] == 'mobilenet_v2':
-            model = torchvision.models.mobilenet_v2(weights = "DEFAULT").features
+            model = torchvision.models.mobilenet_v2().features
         elif model_params['backbone'] == 'mobilenet_v3_small':
             model = torchvision.models.mobilenet_v3_small().features
         elif model_params['backbone'] == 'mobilenet_v3_large':
-            model = torchvision.models.mobilenet_v3_large(weights = "DEFAULT").features
+            model = torchvision.models.mobilenet_v3_large().features
         elif model_params['backbone'] == 'resnet50':
-            model = torchvision.models.resnet50(weights = "DEFAULT")
+            model = torchvision.models.resnet50()
         elif model_params['backbone'] == 'vgg19':
-            model = torchvision.models.vgg19(weights = "DEFAULT").features
+            model = torchvision.models.vgg19().features
         
         if model_params['backbone'] == 'resnet50':
             modules = list(model.children())[:-1]
@@ -93,9 +94,22 @@ def get_model(model_params, pretrain = False):
             elif model_params['backbone'] == 'mobilenet_v3_small':
                 model = torchvision.models.mobilenet_v3_small(weights = "DEFAULT")
             else:
-                raise ValueError("No pretrained model")
+                raise ValueError("No wanted pretrained model version found")
             in_features = model.roi_heads.box_predictor.cls_score.in_features
             model.roi_heads.box_predictor = faster_rcnn.FastRCNNPredictor(in_features, 2)
         elif model_params['model'] == 'RetinaNet':
+            if model_params['backbone'] == 'resnet50':
+                model = torchvision.models.detection.retinanet_resnet50_fpn_v2(weight = "DEFAULT")
+                #Changing classification layer to classify 2 classes only
+                in_features = model.head.classification_head.conv[0].in_channels
+                num_anchors = model.head.classification_head.num_anchors
+                model.head.classification_head.num_classes = 2
+                cls_logits = torch.nn.Conv2d(2048, num_anchors * 2, kernel_size = 3, stride=1, padding=1)
+                #Pytorch documentation code
+                torch.nn.init.normal_(cls_logits.weight, std=0.01)
+                torch.nn.init.constant_(cls_logits.bias, -math.log((1 - 0.01) / 0.01))
+                #Asssign the classification layer back to model
+                model.head.classification_head.cls_logits = cls_logits
+
             raise ValueError("Pretrained for RetinaNet not implemented yet")
     return model
