@@ -409,9 +409,9 @@ def make_pred(model, device, img_batch, treshold):
     images = list(image.to(device) for image in img_batch)
     with torch.no_grad():
         pred = model(images)
-    pred_boxes = [[(x[0], x[1]), (x[2], x[3])] for x in list(pred[0]["boxes"].detach().numpy())]
-    pred_class = list(pred[0]["labels"].detach().numpy())
-    pred_score = list(pred[0]["scores"].detach().numpy())
+    pred_boxes = [[(x[0], x[1]), (x[2], x[3])] for x in list(pred[0]["boxes"].detach().cpu().numpy())]
+    pred_class = list(pred[0]["labels"].detach().cpu().numpy())
+    pred_score = list(pred[0]["scores"].detach().cpu().numpy())
     try:
         over_treshold = [pred_score.index(x) for x in pred_score if x>treshold][-1]
     except IndexError:
