@@ -54,21 +54,21 @@ seed_everything(settings["seed"])
 
 #Get wanted model from inter models 
 if settings["model_type"] == 'faster_rcnn_mobilenet':
-    model = get_model(faster_rcnn_mobilenet_params)
+    model = get_model(faster_rcnn_mobilenet_params, args.pretrained)
 elif settings["model_type"] == 'faster_rcnn_mobilenetV3_large':
-    model = get_model(faster_rcnn_mobilenetV3_Large_params)
+    model = get_model(faster_rcnn_mobilenetV3_Large_params, args.pretrained)
 elif settings["model_type"] == 'faster_rcnn_mobilenetV3_small':
-    model = get_model(faster_rcnn_mobilenetV3_Small_params)
+    model = get_model(faster_rcnn_mobilenetV3_Small_params, args.pretrained)
 elif settings["model_type"] == 'faster_rcnn_resnet':
-    model = get_model(faster_rcnn_resnet_params)
+    model = get_model(faster_rcnn_resnet_params, args.pretrained)
 elif settings["model_type"] == 'faster_rcnn_vgg':
-    model = get_model(faster_rcnn_vgg_params)
+    model = get_model(faster_rcnn_vgg_params, args.pretrained)
 elif settings["model_type"] == 'retinanet_mobilenet':
-    model = get_model(retinanet_mobilenet_params)
+    model = get_model(retinanet_mobilenet_params, args.pretrained)
 elif settings["model_type"] == 'retinanet_resnet':
-    model = get_model(retinanet_resnet_params)
+    model = get_model(retinanet_resnet_params, args.pretrained)
 elif settings["model_type"] == 'retinanet_vgg':
-    model = get_model(retinanet_vgg_params)
+    model = get_model(retinanet_vgg_params, args.pretrained)
 else:
     raise Exception('Invalid model type')
 
