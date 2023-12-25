@@ -1,7 +1,8 @@
 from torchvision.ops import MultiScaleRoIAlign
 from torchvision.models.detection.rpn import AnchorGenerator
-from torchvision.models.detection import FasterRCNN, RetinaNet
-from torchvision.models import ResNet50_Weights, MobileNet_V2_Weights, MobileNet_V3_Small_Weights, MobileNet_V3_Large_Weights, VGG19_Weights
+from torchvision.models.detection import FasterRCNN, RetinaNet, faster_rcnn, retinanet
+#from torchvision.models import ResNet50_Weights, MobileNet_V2_Weights, MobileNet_V3_Small_Weights, MobileNet_V3_Large_Weights, VGG19_Weights
+from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 import torchvision
 import torch
 
@@ -44,48 +45,57 @@ retinanet_vgg_params = {'backbone': 'vgg19',
                         'model': 'RetinaNet'}
 
 
-def get_model(model_params):
-
-    if model_params['backbone'] == 'mobilenet_v2':
-        backbone = torchvision.models.mobilenet_v2(weights = MobileNet_V2_Weights.DEFAULT).features
+def get_model(model_params, pretrain = False):
+    if not pretrain:
+        if model_params['backbone'] == 'mobilenet_v2':
+            model = torchvision.models.mobilenet_v2(weights = "DEFAULT").features
+        elif model_params['backbone'] == 'mobilenet_v3_small':
+            model = torchvision.models.mobilenet_v3_small(weights = "DEFAULT").features
+        elif model_params['backbone'] == 'mobilenet_v3_large':
+            model = torchvision.models.mobilenet_v3_large(weights = "DEFAULT").features
+        elif model_params['backbone'] == 'resnet50':
+            model = torchvision.models.resnet50(weights = "DEFAULT")
+        elif model_params['backbone'] == 'vgg19':
+            model = torchvision.models.vgg19(weights = "DEFAULT").features
         
-    if model_params['backbone'] == 'mobilenet_v3_small':
-        backbone = torchvision.models.mobilenet_v3_small(weights = MobileNet_V3_Small_Weights.DEFAULT).features
-    
-    if model_params['backbone'] == 'mobilenet_v3_large':
-        backbone = torchvision.models.mobilenet_v3_large(weights = MobileNet_V3_Large_Weights.DEFAULT).features
-    
-    if model_params['backbone'] == 'resnet50':
-        resnet = torchvision.models.resnet50(weights = ResNet50_Weights.DEFAULT)
-        modules = list(resnet.children())[:-1]
-        backbone = torch.nn.Sequential(*modules)
-        
-    if model_params['backbone'] == 'vgg19':
-        backbone = torchvision.models.vgg19(weights = VGG19_Weights.DEFAULT).features
-    
-    backbone.out_channels = model_params['out_channels']
+        if model_params['backbone'] == 'resnet50':
+            modules = list(model.children())[:-1]
+            backbone = torch.nn.Sequential(*modules)
+        else:
+            backbone = model.features
+            
+        backbone.out_channels = model_params['out_channels']
+        new_anchor_generator = AnchorGenerator(sizes=((32, 64, 128, 256, 512),), 
+                                            aspect_ratios=((0.5, 1.0, 2.0),))
+        new_roi_pooler = MultiScaleRoIAlign(featmap_names=['0'], output_size=4, sampling_ratio=1)
+        if model_params['model'] == 'FasterRCNN':
+            model = FasterRCNN(backbone=backbone,
+                                num_classes=2,
+                                min_size=min_size,
+                                max_size=max_size, 
+                                image_mean=mean, 
+                                image_std=std,
+                                rpn_anchor_generator = new_anchor_generator,
+                                box_roi_pool=new_roi_pooler)
 
-    new_anchor_generator = AnchorGenerator(sizes=((32, 64, 128, 256, 512),), 
-                                        aspect_ratios=((0.5, 1.0, 2.0),))
-    new_roi_pooler = MultiScaleRoIAlign(featmap_names=['0'], output_size=4, sampling_ratio=1)
-
-    if model_params['model'] == 'FasterRCNN':
-        model = FasterRCNN(backbone=backbone,
-                            num_classes=2,
-                            min_size=min_size,
-                            max_size=max_size, 
-                            image_mean=mean, 
-                            image_std=std,
-                            rpn_anchor_generator = new_anchor_generator,
-                            box_roi_pool=new_roi_pooler)
-
-    if model_params['model'] == 'RetinaNet':
-        model = RetinaNet(backbone=backbone,
-                            num_classes=2, 
-                            min_size=min_size, 
-                            max_size=max_size, 
-                            image_mean=mean, 
-                            image_std=std,
-                            anchor_generator = new_anchor_generator)
-
+        if model_params['model'] == 'RetinaNet':
+            model = RetinaNet(backbone=backbone,
+                                num_classes=2, 
+                                min_size=min_size, 
+                                max_size=max_size, 
+                                image_mean=mean, 
+                                image_std=std,
+                                anchor_generator = new_anchor_generator)
+    else:
+        if model_params['model'] == 'FasterRCNN':
+            if model_params['backbone'] == 'mobilenet_v3_large':
+                model = torchvision.models.detection.fasterrcnn_mobilenet_v3_large_fpn(weights = "DEFAULT")
+            elif model_params['backbone'] == 'resnet50':
+                model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(weights = "DEFAULT")
+            else:
+                raise ValueError("No pretrained model")
+            in_features = model.roi_heads.box_predictor.cls_score.in_features
+            model.roi_heads.box_predictor = faster_rcnn.FastRCNNPredictor(in_features, 2)
+        elif model_params['model'] == 'RetinaNet':
+            raise ValueError("Pretrained for RetinaNet not implemented yet")
     return model
