@@ -10,6 +10,7 @@ parser = argparse.ArgumentParser(description="Test model on a dataset")
 parser.add_argument("-d", "--dataset", type=str, help="Name of a dataset located in the datasets directory")
 parser.add_argument("-m", "--model", type=str, help="Path to a model to test")
 parser.add_argument("-t", "--type", type=str, choices=models ,help="Type of a model to test")
+parser.add_argument("--pretrained", type=bool, help="Was the model pretrained?", default=False)
 args = parser.parse_args()
 
 warnings.filterwarnings("ignore")
