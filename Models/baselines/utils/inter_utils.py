@@ -11,8 +11,9 @@ import matplotlib.pyplot as plt
 import warnings
 from tqdm import tqdm
 import torch.distributed as dist
+import time
 
-models = ["faster_rcnn_mobilenet", "faster_rcnn_mobilenetV3_large", "faster_rcnn_mobilenetV3_small", "faster_rcnn_resnet", "faster_rcnn_vgg", "retinanet_mobilenet", "retinanet_resnet", "retinanet_vgg"]
+models = ["faster_rcnn_mobilenet", "faster_rcnn_mobilenetV3_Large", "faster_rcnn_mobilenetV3_Small", "faster_rcnn_resnet", "faster_rcnn_vgg", "retinanet_mobilenet", "retinanet_resnet", "retinanet_vgg"]
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Interference training settings")
@@ -317,11 +318,12 @@ def show_from_dataset(n, train_data_loader):
     plt.axis("off")
 
 #Takes only one image not a batch!!
-def test_model(model, data_loader, treshold = 0.9, plot = 0):
+def test_model(model, data_loader, treshold = 0.9, plot = 0, save = False):
     model.eval()
     pic_count = 1
     accuracy_list = []
-    for images, targets, image_ids in tqdm(data_loader):
+    loop = tqdm(data_loader)
+    for images, targets, image_ids in loop:
         pred_boxes, pred_score = make_pred(model, images, treshold)
         
         #Extracting targets and images
@@ -340,6 +342,13 @@ def test_model(model, data_loader, treshold = 0.9, plot = 0):
                 plt.imshow(image)
                 plt.axis("off")
         pic_count  += 1
+        if save:
+            if not "testing_result" in os.listdir():
+                os.mkdir("testing_result")
+            image = draw_to_image(image, boxes_dict, points_dict)
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+            image *=255
+            cv2.imwrite(f"testing_result/{image_id}", image)
     return accuracy_list
 
 def calculate_acc(targets, predicted):
@@ -361,7 +370,7 @@ def calculate_acc(targets, predicted):
                 results["labels"][n] = True
                 points["labels"][i] = True
     
-    acc = results["labels"].count(True) / len(targets)
+    acc = results["labels"].count(True) / (len(targets)+points["labels"].count(False))
     return results, points, acc
 
 def draw_to_image(image, box_dict, dot_dict):
@@ -408,10 +417,13 @@ def make_pred(model, img_batch, treshold):
     return pred_boxes, pred_score
 
 def show_inference(img_batch, model, img, treshold):
+    tic = time.perf_counter()
     boxes, score = make_pred(model, img_batch, treshold)
+    toc = time.perf_counter()
     for i, x in enumerate(boxes):
         cv2.rectangle(img, (int(x[0][0]),int(x[0][1])), (int(x[1][0]),int(x[1][1])), color=(255, 0, 0), thickness=2)
-        cv2.putText(img, str(score[i]), (int(x[0][0]),int(x[0][1])), cv2.LINE_AA, 1.2, (255,0,0), 1)
+        cv2.putText(img, str(round(score[i],2)), (int(x[0][0]),int(x[0][1])), cv2.LINE_AA, 1.2, (255,0,0), 1)
     plt.figure(figsize=(20,30))
     plt.imshow(img)
     plt.axis("off")
+    print(f"Inference took {(toc-tic):0.4f} s")

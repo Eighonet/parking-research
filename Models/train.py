@@ -51,9 +51,9 @@ seed_everything(settings["seed"])
 #Get wanted model from inter models 
 if settings["model_type"] == 'faster_rcnn_mobilenet':
     model = get_model(faster_rcnn_mobilenet_params, args.pretrained)
-elif settings["model_type"] == 'faster_rcnn_mobilenetV3_large':
+elif settings["model_type"] == 'faster_rcnn_mobilenetV3_Large':
     model = get_model(faster_rcnn_mobilenetV3_Large_params, args.pretrained)
-elif settings["model_type"] == 'faster_rcnn_mobilenetV3_small':
+elif settings["model_type"] == 'faster_rcnn_mobilenetV3_Small':
     model = get_model(faster_rcnn_mobilenetV3_Small_params, args.pretrained)
 elif settings["model_type"] == 'faster_rcnn_resnet':
     model = get_model(faster_rcnn_resnet_params, args.pretrained)
