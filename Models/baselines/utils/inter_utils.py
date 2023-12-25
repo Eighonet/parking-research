@@ -357,8 +357,8 @@ def test_model(model, device, data_loader, treshold = 0.9, plot = 0, save = Fals
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
             image *=255
             cv2.imwrite(f"testing_result/{image_id}", image)
-        if timeit:
-            print(f"Time of one inference: {t_measured}s")
+    if timeit:
+        print(f"Time of one inference: {t_measured}s")
     return accuracy_list
 
 def calculate_acc(targets, predicted):
