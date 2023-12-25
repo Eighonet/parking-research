@@ -48,7 +48,7 @@ experiment.log_dataset_info(dataset, path = settings["path"])
 
 seed_everything(settings["seed"])
 
-#Get wanted model from inter models 
+#Get wanted model from inter models, add custom models here too
 if settings["model_type"] == 'faster_rcnn_mobilenet':
     model = get_model(faster_rcnn_mobilenet_params, args.pretrained)
 elif settings["model_type"] == 'faster_rcnn_mobilenetV3_Large':
@@ -65,6 +65,10 @@ elif settings["model_type"] == 'retinanet_resnet':
     model = get_model(retinanet_resnet_params, args.pretrained)
 elif settings["model_type"] == 'retinanet_vgg':
     model = get_model(retinanet_vgg_params, args.pretrained)
+elif settings["model_type"] == 'retinanet_mobilenetV3_Large':
+    model = get_model(retinanet_mobilenetV3_Large_params)
+elif settings["model_type"] == 'retinanet_mobilenetV3_Small':
+    model = get_model(retinanet_mobilenetV3_Small_params)
 else:
     raise Exception('Invalid model type')
 

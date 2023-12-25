@@ -11,6 +11,9 @@ max_size = 500
 mean = [0.485, 0.456, 0.406]
 std = [0.229, 0.224, 0.225]
 
+
+
+#You can add custom models here, add them to the models list in inter_utils.py and in train.py for argument parser to work
 faster_rcnn_mobilenet_params = {'backbone': 'mobilenet_v2', 
                                 'out_channels': 1280,
                                 'model': 'FasterRCNN'}
@@ -42,6 +45,14 @@ retinanet_resnet_params = {'backbone': 'resnet50',
 retinanet_vgg_params = {'backbone': 'vgg19',
                         'out_channels': 512,
                         'model': 'RetinaNet'}
+
+retinanet_mobilenetV3_Large_params = {'backbone' : 'mobilenet_v3_large',
+                                  'out_channels': 960,
+                                  'model': 'RetinaNet'}
+
+retinanet_mobilenetV3_Small_params = {'backbone' : 'mobilenet_v3_small',
+                                  'out_channels': 576,
+                                  'model': 'RetinaNet'}
 
 
 def get_model(model_params, pretrain = False):
