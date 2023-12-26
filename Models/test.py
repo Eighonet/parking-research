@@ -38,9 +38,9 @@ elif args.type == 'retinanet_resnet':
     model = get_model(retinanet_resnet_params, args.pretrained)
 elif args.type == 'retinanet_vgg':
     model = get_model(retinanet_vgg_params, args.pretrained)
-elif args.type["model_type"] == 'retinanet_mobilenetV3_Large':
+elif args.type == 'retinanet_mobilenetV3_Large':
     model = get_model(retinanet_mobilenetV3_Large_params)
-elif args.type["model_type"] == 'retinanet_mobilenetV3_Small':
+elif args.type == 'retinanet_mobilenetV3_Small':
     model = get_model(retinanet_mobilenetV3_Small_params)
 else:
     raise Exception('Invalid model type')
