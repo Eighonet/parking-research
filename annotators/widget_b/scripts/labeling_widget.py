@@ -61,6 +61,12 @@ def pm_widget(annotation_path: str="annotations.json", image_dirs : str = "img",
         decoded_bytes = cv2.imencode('.jpg', decoded)[1].tobytes()
         return decoded_bytes
     
+    def get_image_size(path):
+        img = plt.imread(path)
+        width = len(img[0])
+        height = len(img)
+        return width, height
+
     # Was for changing folder useless now          
     # def on_change(change) -> None:
     #     if change["type"] == "change" and change["name"] == "value":
@@ -86,9 +92,18 @@ def pm_widget(annotation_path: str="annotations.json", image_dirs : str = "img",
         
         try:
             os.mkdir(output_dir + "int_markup")
+        except:
+            pass
+        try:
             os.mkdir(output_dir + "patch_markup")
         except:
             pass
+        try:
+            os.mkdir(output_dir + "YOLO_COCO_markup")
+        except:
+            pass
+        
+        img_width, img_height =  get_image_size(image_dirs + "/" + annotator.current_image)
         
         for folder in annotator.labels.keys():
                 current_markup = annotator.labels[folder]
@@ -96,6 +111,7 @@ def pm_widget(annotation_path: str="annotations.json", image_dirs : str = "img",
                 
                 standard_output = {"lots":[]}
                 patch_output = {"lots":[]}
+                COCO_output = ""
 
                 for place in image_rois.keys():
                     points = np.array(place).T.astype("int")
@@ -103,16 +119,23 @@ def pm_widget(annotation_path: str="annotations.json", image_dirs : str = "img",
 
                     x_max, x_min = int(max(np.array(points)[:, 0])), int(min(np.array(points)[:, 0]))
                     y_max, y_min = int(max(np.array(points)[:, 1])), int(min(np.array(points)[:, 1]))
+                    width = x_max-x_min
+                    height = y_max - y_min
+                    x_center, y_center = (((width) / 2) + x_min), (((height) / 2) + y_min)
                     lot_patch = {"coordinates":[[x_max, y_max], [x_max, y_min], 
                                                 [x_min, y_min], [x_min, y_max]], "label": image_rois[place]}
                     standard_output["lots"].append(lot)
                     patch_output["lots"].append(lot_patch)
+                    COCO_output += str(int(image_rois[place])) +' '+ str(x_center/img_width) +' '+ str(y_center/img_height) +' '+ str(width/img_width) +' '+ str(height/img_height) + '\n'
 
                 with open(output_dir + "int_markup/" +  folder[:-4] + '.json', 'w') as f:
                     json.dump(standard_output, f)
 
                 with open(output_dir + "patch_markup/" + folder[:-4] + '.json', 'w') as f:
-                    json.dump(patch_output, f)     
+                    json.dump(patch_output, f)
+                
+                with open(output_dir + "YOLO_COCO_markup/" + folder[:-4] + '.txt', 'w') as f:
+                    f.write(COCO_output)
 
     def process_list(input_str: str) -> list:
         return re.sub(r'[\'\[\]]', ' ', input_str).replace(" ", "").split(",")
@@ -131,7 +154,7 @@ def pm_widget(annotation_path: str="annotations.json", image_dirs : str = "img",
 
     def forward_button_clicked(b):
         folders = sorted(list(annotator.markup.keys()))
-        files = [file for file in listdir(annotator.current_image[:-4])]
+        files = [file for file in listdir(image_dirs)]
         idx = files.index(annotator.current_image)
         if idx < len(files) - 1:
             image_dropdown.value = files[idx+1]
@@ -142,12 +165,12 @@ def pm_widget(annotation_path: str="annotations.json", image_dirs : str = "img",
 
     def backward_button_clicked(b):
         folders = sorted(list(annotator.markup.keys()))
-        files = [file for file in listdir(annotator.current_image[:-4])]
+        files = [file for file in listdir(image_dirs)]
         idx = files.index(annotator.current_image)
         if idx > 0:
             image_dropdown.value = files[idx-1]
             annotator.current_image = files[idx-1]
-            byte_image = get_image(image_dirs.value + "/" + str(files[idx-1]))
+            byte_image = get_image(image_dirs + "/" + str(files[idx-1]))
             image.value = draw_lines(byte_image)
 
 
