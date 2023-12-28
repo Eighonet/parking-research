@@ -201,7 +201,7 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
 
     img = load_image(path)
         
-    fig, axes = plt.subplots(figsize=[10,10], num='Markup widget rev2')
+    fig, axes = plt.subplots(figsize=[16,9], num='Markup widget rev2')
     axes.imshow(img)
     plt.axis("off")
     fig.get_tight_layout()

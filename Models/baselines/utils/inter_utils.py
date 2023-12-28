@@ -303,7 +303,8 @@ def train_inter_model(model, num_epochs, train_data_loader, valid_data_loader, d
 
 def show_from_dataset(n, train_data_loader):
     i = 1
-    for images, targets, image_ids in train_data_loader:
+    loop = tqdm(train_data_loader)
+    for images, targets, image_ids in loop:
         image = images
         target = targets
         image_id = image_ids
@@ -314,7 +315,7 @@ def show_from_dataset(n, train_data_loader):
     image = image[0].permute(1,2,0)
     image = image.detach().numpy()
     for x in pred_boxes:
-        cv2.rectangle(image, (int(x[0][0]),int(x[0][1])), (int(x[1][0]),int(x[1][1])), color=(255, 0, 0), thickness=2)
+        cv2.rectangle(image, (int(x[0][0]),int(x[0][1])), (int(x[1][0]),int(x[1][1])), color=(255, 0, 0), thickness=5)
     fig = plt.figure(figsize=(15,15))
     plt.imshow(image)
     plt.axis("off")
