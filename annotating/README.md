@@ -70,4 +70,4 @@ Do this for all of the images and then click the save and generate button. This 
     ├── Sunny
     └── Winter
 ```
-There should be .json files and .txt file in the `markup` directories.
+There should be `.json` or `.txt` files in the `markup` directories.

@@ -1,177 +1,22 @@
-# Revising deep learning methods in parking lot occupancy detection
+# Detection of parking space availability based on video
+This is a repo that contains the scripts for *''Detection of parking space availability based on video''* thesis and bachelor work.
 
-Welcome to the research repo of the *''Revising deep learning methods in parking lot occupancy detection''* paper. Here we published the actual code regarding the parking lot occupancy detection problem considered in our study.
+This repo originated as a fork of a repository from [*''Revising deep learning methods in parking lot occupancy detection''*](https://arxiv.org/abs/2306.04288). I greatly thank the authors for their work. And I recommend checking the repository along with their paperk, their reasearch helped me significantly.
 
-This is a fork for a personal study/research for a bachelor thesis.
-Goal of this fork is to port the tools to newest python libraries and to serve as a personal playground.
-Will propose fixes to the original repo, once done.
-
+The authors are:
 Anastasia Martynova, [Mikhail Kuznetsov](https://github.com/mmkuznecov), [Vadim Porvatov](https://www.researchgate.net/profile/Vadim-Porvatov), Vladislav Tishin, [Natalia Semenova](https://www.researchgate.net/profile/Natalia-Semenova-7).
 
-arXiv PDF: https://arxiv.org/abs/2306.04288
+And their repo is: [parking-reeach](https://github.com/Eighonet/parking-research)
 
-# Datasets
+The original goal of this fork is to port the tools to newest python libraries and to serve as a personal playground  for the work. But after a lot of changes and modifications to the code. It is now used as a proof of concept to the final work.
 
-In this section, we introduce the processed versions of datasets used in our experiments: ACPDS, ACMPS, CNRPark, PKLot and SPKL.
+The training and testing scripts support only a object recognition models for now.
 
-Links to the datasets:
-- [ACPDS](https://sc.link/1KZq)
-- [ACMPS](https://sc.link/1KZv)
-- [PKLot](https://sc.link/1KZt)
-- [CNRPark](https://sc.link/1KZr)
-- [SPKLv2](https://sc.link/1KZu)
-
-Dataset structure:
-
-```
-[DATASET_NAME]
-│
-└───images
-│       image1.jpg
-│       image2.jpg
-│       ...
-│
-└───int_markup
-│       image1.json
-│       image2.json
-│       ...
-|
-└───patch_markup
-|       └───classes
-|             └───Busy
-|             |     image1.json
-|             |     image2.json
-|             |     ...
-|             |
-|             └───Free
-|                   image3.json
-|                   image4.json
-|                   ...
-|
-│       image1.json
-│       image2.json
-|       image3.json
-|       image4.json
-│       ...
-|
-└───patch_splitted
-|       └───train
-|       |     └───Busy
-|       |     |     patch1.jpg
-|       |     |     patch2.jpg
-|       |     |      ...
-|       |     |
-|       |     └───Free
-|       |           patch3.jpg
-|       |           patch4.jpg
-|       |           ...
-|       |
-|       └───test
-|       └───val
-|
-└───splitted_images
-|       └───train
-|       |     image1.jpg
-|       |     image2.jpg
-|       |     ...
-|       |
-|       └───test
-|       └───val
-|
-[DATASET_NAME]_image_level_markup.json
-busy_ilm_markup.json
-free_ilm_markup.json
-[DATASET_NAME]_dataframe.csv
-```
-
-For each of the datasets, we also provided visual condition labels describing the presence of the special effects in the images:
-
-- `Sunny` - sunny weather;
-- `Overcast` - overcast weather;
-- `Rain` - rainy weather;
-- `Winter` - winter weather, snow on the ground;
-- `Fog` - foggy weather;
-- `Glare` - glare on the image;
-- `Night` - night time;
-- `Infrared` - infrared image;
-- `Occlusion (car)` - cars overlap each other;
-- `Occlusion (tree)` - trees overlap cars and parking lots;
-- `Distortion` - parking lot is distorted or the image recorded by a camera with a wide angle.
-
-Image-level annotations have the following structure:
-
-```
-[DATASET_NAME]_annotation_classes
-│
-└───CLASS_NAME_1
-│       image1.jpg
-│       image2.jpg
-│       ...
-│
-└───CLASS_NAME_2
-│       image3.jpg
-│       image4.jpg
-│       ...
-│
-└───CLASS_NAME_3
-│       image5.jpg
-│       image6.jpg
-│       ...
-│
-...
-```
-
-Overall, each dataset's structure can be described as follows:
-
-- `images` folder contains the images of parking lots;
-- `int_markup` folder contains the intersection-level annotations of parking lots; 
-- `patch_markup` folder contains the patch-level annotations of parking lots;
-- `patch_splitted` folder contains the split patches of parking lots;
-- `splitted_images` folder contains the split images of parking lots; 
-- `DATASET_NAME_image_level_markup.json` file contains the image-level annotations of parking lots; 
-- `busy_ilm_markup.json` and `free_ilm_markup.json` files contain the image-level annotations of free and occupied parking lots.
-
-# Custom dataset
-
-All scripts for data preprocessing are located in the `data_preprocessing` folder.
-
-To preprocess your own dataset, you need to create a folder with the name of your dataset and put the images of parking lots in the `images` folder. After that, you should perform the labelling procedure using the widgets from the `annotators` folder. 
-
-# Experiments running
-
-In this study, we explored two approaches to the parking lot occupancy detection problem: patch-based classification and intersection-based classification.
-
-List of implemented baseline models for patch-based classification:
-
-CNN models:
-
-- ResNet50;
-- MobileNet;
-- CarNet;
-- AlexNet;
-- mAlexNet;
-- VGG-16;
-- VGG-19;
-- CFEN.
-
-Vision transformer models:
-
-- ViT (no prt);
-- ViT (prt);
-- DeiT (prt);
-- PiT (prt);
-- ViT (SPT LSA).
-
-List of implemented baseline models for intersection-based classification:
-
-- Faster R-CNN with ResNet-50 backbone;
-- Faster R-CNN with MobileNet backbone;
-- Faster R-CNN with VGG-19 backbone;
-- RetinaNet with ResNet-50 backbone;
-- RetinaNet with MobileNet backbone;
-- RetinaNet with VGG-19 backbone.
-
-All experiments were conducted on NVIDIA Tesla V100 GPUs.
+## What hase been added / changed
+- I written a training script that lets the user choose how to train a model with the dataset format from their work as both as a training script that uses the testing images from the dataset to test the trained model.
+- The creation of your own dataset was a bit simplified and reworked. Consult the readme located in [annotating](annotating/) directory.
+- All of the scripts should run both on CPU and GPU.
+- Tested on Python 3.11
 
 # Prerequisites
 
@@ -188,35 +33,26 @@ conda env create -f environment.yml
 conda activate parking_research
 ```
 
-We recommend using Python >= 3.7 and torchvision >= 1.7.0 as far as some of the architectures are not implemented in the previous versions.
+The trainig script is setup to log information to [Comet](comet.com).
+The training script looks for a api.key file containing a key that you can obtain in your user settings after registering.
 
-# Baseline models
-
-All baseline models are located in the `baselines` folder. All models are implemented using PyTorch and can be trained with the help of `train` files by passing the model name.
-
-# Data processing
-
-The data processing script `process_data.py` is located in the `data_preprocessing` folder. You should pass the name of your dataset as an argument:
-
-```bash
-python process_data.py --dataset DATASET_NAME
+# Training
+Create a `dataset` directory containing the datasets in the same location as the training script. Add a `api.key` file containing your come API key. Then run the script and follow to onscreen prompts:
+```bash 
+python train.py
 ```
+For an average size dataset you can use the default values for learning speed, batch size and number of epochs. Always check the validation batch progress to make sure that the model is not overfitting!
 
-**Important!**: you should configure the following folder structure:
-
+# Running tests
+After training a model you can test it using the `test.py` script. Run it and follow the prompts:
+```bash 
+python test.py
 ```
-[DATASET_NAME]
-│
-└───[DATASET_NAME]
-|
-└───[DATASET_NAME]_annotation_classes
-```
+The testing function can print out the time of one inference and save all of the images that were tested.
 
-The structure of the included directories is described above in the `Data` section.
+# Contact me
 
-# Contact us
-
-If you have some questions about the code, you are welcome to open an issue or send me an email, I will respond to that as soon as possible.
+If you have some questions about the code, you are welcome to open an issue or contact me through an email. Please do not contact the original authors with questions regarding this fork.
 
 # License
 
