@@ -13,7 +13,7 @@ def check_float(answers, current):
 
 #Checks if a string is an integer
 def check_int(answers, current):
-    if current.isdigit():
+    if not current.isdigit():
         raise errors.ValidationError('', reason='must be an int!')
     else:
         return True 

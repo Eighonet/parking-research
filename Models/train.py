@@ -17,7 +17,10 @@ try:
 except:
     raise FileNotFoundError("Comet key.api not found!")
 
-answers = inquirer.prompt(questions)
+try:
+    answers = inquirer.prompt(questions)
+except KeyboardInterrupt:
+    raise KeyboardInterrupt
 
 experiment = comet_ml.Experiment(
     api_key=key,
