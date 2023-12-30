@@ -41,7 +41,22 @@ Create a `dataset` directory containing the datasets in the same location as the
 ```bash 
 python train.py
 ```
-For an average size dataset you can use the default values for learning speed, batch size and number of epochs. Always check the validation batch progress to make sure that the model is not overfitting!
+For an average size dataset you can use the default values for learning speed, batch size and number of epochs. Always check the validation batch progress to make sure that the model is not overfitting! 
+
+Every model training is run with a different seed for the random number generator, this will make it so that no model is the same. To get rid of this, set a permanent seed in the setting dictionar instead of the one geneerated from a current time:
+```python
+settings = {
+    "batch_size" : int(answers["batch"]),
+    "epochs" : int(answers["epoch"]),
+    "learning_rate": float(answers["rate"]),
+    "dataframe" : "datasets/"+dataset+"/"+dataset+"/"+dataset+"_dataframe.csv",
+    "path" : "datasets/"+dataset+'/'+dataset+'/',
+    "model_type" : answers["model"],
+    "seed" : int(datetime.now().timestamp()), #Here goes your personal seed
+    "save_rate" : int(answers["save_rate"]),
+    "pretrained" : answers["pretrained"]
+}
+```
 
 # Running tests
 After training a model you can test it using the `test.py` script. Run it and follow the prompts:
