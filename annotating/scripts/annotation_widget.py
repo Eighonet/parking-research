@@ -159,6 +159,7 @@ def pa_widget(markup_dir = "Downloads/parking", output_dir = ""):
        
         with open(output_dir + "metadata.json", "w") as outfile:
             json.dump(metadata, outfile)
+        print("Saving sucesfull! Run the next widget")
 
     def on_change(change):
         if change['type'] == 'change' and change['name'] == 'value':

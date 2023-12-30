@@ -3,6 +3,8 @@ from os.path import isfile, join
 import json
 import re
 
+import shutil
+
 from IPython.display import display, HTML, Image
 from ipywidgets import widgets, Dropdown, Box, Label, HBox, VBox, interact, interactive, fixed, interact_manual
 import ipywidgets as widgets
@@ -23,11 +25,13 @@ import cv2
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 
+from scripts.process_data import *
+
 colors = {1: (0, 0, 255), 0: (255, 0, 0)} 
 thickness = 4
 isClosed = True
 
-def pm_widget(annotation_path: str="annotations.json", image_dirs : str = "img", output_dir:str=""):
+def pm_widget(annotation_path: str="annotations.json", dataset : str = "img", output_dir:str=""):
     class Annotator(object):
         def __init__(self):
             #Loading annotations from dict to touple cords
@@ -37,15 +41,18 @@ def pm_widget(annotation_path: str="annotations.json", image_dirs : str = "img",
                 return markup
             
             #Opening JSON reading and loadig into dict markup
-            with open(annotation_path) as f:
-                self.markup = json.load(f)
-                 
-            img_dict_names = sorted(list(self.markup.keys()))
+            try:
+                with open(annotation_path) as f:
+                    self.markup = json.load(f)
+            except:
+                raise FileNotFoundError("annotations.json not found")
+            
+            self.img_dict_names = sorted(list(self.markup.keys()))
             self.labels = {}
-            for i in img_dict_names:
+            for i in self.img_dict_names:
                 data = to_tuple(self.markup[i])
-            self.labels = {file:{data[j]:1 for j in range(len(data))} for file in img_dict_names}
-            self.current_image = img_dict_names[0]
+            self.labels = {file:{data[j]:1 for j in range(len(data))} for file in self.img_dict_names}
+            self.current_image = self.img_dict_names[0]
             
     def get_image(path: str) -> bytes:
         with open(path, 'rb') as f:
@@ -88,22 +95,24 @@ def pm_widget(annotation_path: str="annotations.json", image_dirs : str = "img",
             byte_image = get_image(image_dirs + "/" + str(change["new"]))
             image.value = draw_lines(byte_image)
 
-    def download_button_clicked(b, output_dir:str=""):
+    def download_button_clicked(b):
+        output_dir = os.path.join(dataset, dataset_name)
+        img_directory = os.path.join(output_dir, "images")
+
+        try:
+            os.mkdir(output_dir + "/" + "int_markup")
+        except:
+            pass
+        try:
+            os.mkdir(output_dir + "/" + "patch_markup")
+        except:
+            pass
+        try:
+            os.mkdir(output_dir + "/" + "YOLO_COCO_markup")
+        except:
+            pass
         
-        try:
-            os.mkdir(output_dir + "int_markup")
-        except:
-            pass
-        try:
-            os.mkdir(output_dir + "patch_markup")
-        except:
-            pass
-        try:
-            os.mkdir(output_dir + "YOLO_COCO_markup")
-        except:
-            pass
-        
-        img_width, img_height =  get_image_size(image_dirs + "/" + annotator.current_image)
+        img_width, img_height =  get_image_size(img_directory + "/" + annotator.current_image)
         
         for folder in annotator.labels.keys():
                 current_markup = annotator.labels[folder]
@@ -128,14 +137,20 @@ def pm_widget(annotation_path: str="annotations.json", image_dirs : str = "img",
                     patch_output["lots"].append(lot_patch)
                     COCO_output += str(int(image_rois[place])) +' '+ str(x_center/img_width) +' '+ str(y_center/img_height) +' '+ str(width/img_width) +' '+ str(height/img_height) + '\n'
 
-                with open(output_dir + "int_markup/" +  folder[:-4] + '.json', 'w') as f:
+                with open(output_dir + "/int_markup/" +  folder[:-4] + '.json', 'w') as f:
                     json.dump(standard_output, f)
 
-                with open(output_dir + "patch_markup/" + folder[:-4] + '.json', 'w') as f:
+                with open(output_dir + "/patch_markup/" + folder[:-4] + '.json', 'w') as f:
                     json.dump(patch_output, f)
                 
-                with open(output_dir + "YOLO_COCO_markup/" + folder[:-4] + '.txt', 'w') as f:
+                with open(output_dir + "/YOLO_COCO_markup/" + folder[:-4] + '.txt', 'w') as f:
                     f.write(COCO_output)
+        #Process data using the process_data functions
+        img_annotation_classes(dataset_name)
+        patch_crop(dataset_name)
+        patch_ilm(dataset_name)
+        splitter(dataset_name)
+        get_dataframe(dataset_name)
 
     def process_list(input_str: str) -> list:
         return re.sub(r'[\'\[\]]', ' ', input_str).replace(" ", "").split(",")
@@ -154,7 +169,7 @@ def pm_widget(annotation_path: str="annotations.json", image_dirs : str = "img",
 
     def forward_button_clicked(b):
         folders = sorted(list(annotator.markup.keys()))
-        files = [file for file in listdir(image_dirs)]
+        files = processed_names
         idx = files.index(annotator.current_image)
         if idx < len(files) - 1:
             image_dropdown.value = files[idx+1]
@@ -165,7 +180,7 @@ def pm_widget(annotation_path: str="annotations.json", image_dirs : str = "img",
 
     def backward_button_clicked(b):
         folders = sorted(list(annotator.markup.keys()))
-        files = [file for file in listdir(image_dirs)]
+        files = processed_names
         idx = files.index(annotator.current_image)
         if idx > 0:
             image_dropdown.value = files[idx-1]
@@ -175,16 +190,20 @@ def pm_widget(annotation_path: str="annotations.json", image_dirs : str = "img",
 
 
     annotator = Annotator()
+    dataset_name = os.path.basename(dataset)
+    image_dirs= os.path.join(os.path.join(dataset,dataset), "images")
     
     # dropdowns
-    corresponding_images = widgets.Label(value=str([f for f in listdir(image_dirs) if f[0] != "."]))
+    extensions = ['.jpg', '.jpeg', '.png']
+    #corresponding_images = widgets.Label(value=str([f for f in listdir(image_dirs) if os.path.splitext(f)[1] in extensions]))
+    corresponding_images = widgets.Label(value = str(annotator.img_dict_names))
     processed_names = process_list(corresponding_images.value)
     image_dropdown = widgets.Dropdown(options=processed_names)
 
     #buttons
     button_forward = widgets.Button(description="→", layout={"width": "35px"})
     button_backward = widgets.Button(description="←", layout={"width": "35px"})
-    button_download = widgets.Button(description="Save", layout={"width": "60px"})
+    button_download = widgets.Button(description="Save and process")
 
     coordinates = HTML('[]')
 

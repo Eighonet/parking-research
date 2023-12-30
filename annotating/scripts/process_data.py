@@ -7,16 +7,45 @@ from tqdm import tqdm
 import shutil
 import random
 import pandas as pd
+from pathlib import Path
+extensions = ['.jpg', '.jpeg', '.png', '.json']
+ignore = [".DS_Store"]
+
+
+def list_images(path):
+    images = []
+    for file_name in os.listdir(path):
+        for extension in extensions:
+            if extension in file_name:
+                images.append(file_name)
+                break
+    return images
+
+
 
 def img_annotation_classes(dataset):
 
     annot_classes_dir = f"{dataset}/{dataset}_annotation_classes"
     main_dir = f"{dataset}/{dataset}"
 
-    full_image_set = set(os.listdir(f'{main_dir}/images'))
+    full_image_set = set(list_images(os.path.join(main_dir,"images")))
 
-    annotation_classes = os.listdir(annot_classes_dir)
-    annotation_sets = [set(os.listdir(f'{annot_classes_dir}/{annot_class}')) for annot_class in annotation_classes]
+    annotation_classes = []
+    for annot in os.listdir(annot_classes_dir):
+        if os.path.isdir(os.path.join(annot_classes_dir, annot)):
+            annotation_classes.append(annot)
+    
+    annotation_sets = []
+    for annot_class in annotation_classes:
+        directory = []
+        for img_name in os.listdir(f'{annot_classes_dir}/{annot_class}'):
+            for extension in ignore:
+                if extension not in img_name:
+                    directory.append(img_name)
+                    break
+        annotation_sets.append(set(directory))
+    
+    #annotation_sets = [set(os.listdir(f'{annot_classes_dir}/{annot_class}')) for annot_class in annotation_classes]
 
     annot_classes_dict = {img: [] for img in full_image_set}
 
@@ -35,16 +64,20 @@ def patch_crop(dataset):
     int_markup_dir = f"{main_dir}/int_markup"
     patch_dir = f"{main_dir}/patch_markup"
 
-    os.mkdir(patch_dir)
-    os.mkdir(f"{patch_dir}/Busy")
-    os.mkdir(f"{patch_dir}/Free")
+    if not os.path.exists(patch_dir):
+        os.mkdir(patch_dir)
+        os.mkdir(f"{patch_dir}/Busy")
+        os.mkdir(f"{patch_dir}/Free")
+    elif not os.path.exists(f"{patch_dir}/Busy"):
+        os.mkdir(f"{patch_dir}/Busy")
+        os.mkdir(f"{patch_dir}/Free")
 
-    images = os.listdir(images_dir)
+    images = list_images(images_dir)
 
     count = 0
     for image_path in tqdm(images):
         if image_path.split('.')[-1] == "jpg":
-            annot_path = f"{int_markup_dir}/{image_path.split('.')[0]}.json"
+            annot_path = f"{int_markup_dir}/{os.path.splitext(image_path)[0]}.json"
             annot = json.load(open(annot_path))
             img = cv2.imread(f"{images_dir}/{image_path}")
             for lot in annot["lots"]:
@@ -73,13 +106,13 @@ def patch_ilm(dataset):
     busy_dict = {}
     free_dict = {}
     
-    images = os.listdir(images_dir)
+    images = list_images(images_dir)
     count = 0
     error_count = 0
 
     for image_path in tqdm(images):
         if image_path.split('.')[-1] == "jpg":
-            annot_path = f"{int_markup_dir}/{image_path.split('.')[0]}.json"
+            annot_path = f"{int_markup_dir}/{os.path.splitext(image_path)[0]}.json"
             annot = json.load(open(annot_path))
             for lot in annot["lots"]:
                 
@@ -132,8 +165,8 @@ def splitter(dataset, train_ratio=0.6, val_ratio=0.1, test_ratio=0.3):
     os.mkdir(f"{main_dir}/patch_splitted/test/Busy")
     os.mkdir(f"{main_dir}/patch_splitted/test/Free")
 
-    busy_images = os.listdir(f"{patch_dir}/Busy")
-    free_images = os.listdir(f"{patch_dir}/Free")
+    busy_images = list_images(f"{patch_dir}/Busy")
+    free_images = list_images(f"{patch_dir}/Free")
 
     # shuffle images
 
@@ -170,7 +203,7 @@ def splitter(dataset, train_ratio=0.6, val_ratio=0.1, test_ratio=0.3):
     for image in free_test:
         shutil.copy(f"{patch_dir}/Free/{image}", f"{main_dir}/patch_splitted/test/Free/{image}")
 
-    images_list = os.listdir(f"{main_dir}/images")
+    images_list = list_images(f"{main_dir}/images")
     random.shuffle(images_list)
     train_images = images_list[:int(len(images_list)*train_ratio)]
     val_images = images_list[int(len(images_list)*train_ratio):int(len(images_list)*(train_ratio+val_ratio))]
@@ -198,12 +231,12 @@ def get_dataframe(dataset):
     VAL = f'{main_dir}/splitted_images/val'
     TEST = f'{main_dir}/splitted_images/test'
 
-    train_list = os.listdir(TRAIN)
-    val_list = os.listdir(VAL)
-    test_list = os.listdir(TEST)
+    train_list = list_images(TRAIN)
+    val_list = list_images(VAL)
+    test_list = list_images(TEST)
 
-    image_list = os.listdir(IMAGES)
-    json_list = os.listdir(JSONS)
+    image_list = list_images(IMAGES)
+    json_list = list_images(JSONS)
 
     image_list = sorted(image_list)
     json_list = sorted(json_list)
