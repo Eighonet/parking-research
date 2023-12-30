@@ -17,13 +17,12 @@ try:
 except:
     raise FileNotFoundError("Comet key.api not found!")
 
+answers = inquirer.prompt(questions)
+
 experiment = comet_ml.Experiment(
     api_key=key,
     project_name="Parking_occupancy"
 )
-
-answers = inquirer.prompt(questions)
-
 experiment.set_name(answers["name"])
 
 
