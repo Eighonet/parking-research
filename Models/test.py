@@ -27,7 +27,6 @@ questions = [
                   choices = ["faster_rcnn_mobilenetV3_Large", "faster_rcnn_resnet", "retinanet_resnet"],
                   ignore = lambda x: x["pretrained"] == False),
     
-    inquirer.Confirm('retrain', message = "Retrain an existing model?", default=False),
     inquirer.Path('path',
                  message="Path to a model to test",
                  path_type=inquirer.Path.DIRECTORY
