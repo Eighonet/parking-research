@@ -34,7 +34,8 @@ questions = [
     inquirer.Confirm('retrain', message = "Retrain an existing model?", default=False),
     inquirer.Path('saved',
                  message="Path to a saved model to retrain",
-                 path_type=inquirer.Path.DIRECTORY,
+                 path_type=inquirer.Path.FILE,
+                 exists = True,
                  ignore = lambda x: x["retrain"] == False
                 ),
     

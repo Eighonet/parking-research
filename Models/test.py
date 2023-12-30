@@ -18,18 +18,19 @@ questions = [
     
     inquirer.Confirm('pretrained', message = "Using a pretrained model?", default=False),
     inquirer.List('model',
-                  message="What model do you want to train?",
+                  message="What model type?",
                   choices = ["faster_rcnn_mobilenet", "faster_rcnn_mobilenetV3_Large", "faster_rcnn_mobilenetV3_Small", "faster_rcnn_resnet", "faster_rcnn_vgg", "retinanet_mobilenet", "retinanet_resnet", "retinanet_vgg", "retinanet_mobilenetV3_Small", "retinanet_mobilenetV3_Large"],
                   ignore = lambda x: x["pretrained"] == True),
     
     inquirer.List('model',
-                  message="What model do you want to train?",
+                  message="What model do type?",
                   choices = ["faster_rcnn_mobilenetV3_Large", "faster_rcnn_resnet", "retinanet_resnet"],
                   ignore = lambda x: x["pretrained"] == False),
     
     inquirer.Path('path',
                  message="Path to a model to test",
-                 path_type=inquirer.Path.DIRECTORY
+                 path_type=inquirer.Path.FILE,
+                 exists = True
                 ),
     
     inquirer.Text('dataset',
