@@ -249,7 +249,7 @@ pyrightconfig.json
 **/.DS_Store
 .vscode
 **/datasets
-.code-workspace
+*.code-workspace
 **/ACPDS
 **/Saved_Models
 annotators/widget_b/img
@@ -261,4 +261,3 @@ annotators/widget_a/parking_photos
 api.key
 **/testing_result
 renamer.py
-*.code-workspace
