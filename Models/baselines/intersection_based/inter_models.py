@@ -1,6 +1,6 @@
 from torchvision.ops import MultiScaleRoIAlign
 from torchvision.models.detection.rpn import AnchorGenerator
-from torchvision.models.detection import FasterRCNN, RetinaNet, faster_rcnn, retinanet
+from torchvision.models.detection import FasterRCNN, RetinaNet, faster_rcnn, re
 import torchvision
 import torch
 import math
