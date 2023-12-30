@@ -102,8 +102,6 @@ def get_model(model_params, pretrain = False):
                 model = torchvision.models.detection.fasterrcnn_mobilenet_v3_large_fpn(weights = "DEFAULT")
             elif model_params['backbone'] == 'resnet50':
                 model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(weights = "DEFAULT")
-            elif model_params['backbone'] == 'mobilenet_v3_small':
-                model = torchvision.models.mobilenet_v3_small(weights = "DEFAULT")
             else:
                 raise ValueError("No wanted pretrained model version found")
             in_features = model.roi_heads.box_predictor.cls_score.in_features

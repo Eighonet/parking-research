@@ -1,7 +1,6 @@
 import numpy as np
 import torch
 import os
-import argparse
 from torch.utils.data import Dataset
 import cv2
 import albumentations as A
@@ -13,23 +12,23 @@ from tqdm import tqdm
 import torch.distributed as dist
 import time
 
-models = ["faster_rcnn_mobilenet", "faster_rcnn_mobilenetV3_Large", "faster_rcnn_mobilenetV3_Small", "faster_rcnn_resnet", "faster_rcnn_vgg", "retinanet_mobilenet", "retinanet_resnet", "retinanet_vgg", "retinanet_mobilenetV3_Small", "retinanet_mobilenetV3_Large"]
+# models = ["faster_rcnn_mobilenet", "faster_rcnn_mobilenetV3_Large", "faster_rcnn_mobilenetV3_Small", "faster_rcnn_resnet", "faster_rcnn_vgg", "retinanet_mobilenet", "retinanet_resnet", "retinanet_vgg", "retinanet_mobilenetV3_Small", "retinanet_mobilenetV3_Large"]
 
-def parse_args():
-    parser = argparse.ArgumentParser(description="Interference training settings")
-    parser.add_argument('-d', '--dataset', type=str, help="Name of dataset located in /datasets directory")
-    parser.add_argument('-m', '--model', type=str, choices=models, help="Select a model type", default=models[0])
-    parser.add_argument('-e', '--epoch', type=int, help="Number of training epochs", default=50)
-    parser.add_argument('-s', '--saved', type=str, help="Path to saved model to retrain on new dataset", default = None)
-    parser.add_argument('-n', '--name', type=str, help="Name of experiment in comet", default = None)
-    parser.add_argument('-b', '--batch', type=int, help="Size of img batch", default = 4)
-    parser.add_argument('-r', '--rate', type=float, help="Learning rate", default = 0.001)
-    parser.add_argument('--saveRate', type=int, help="Save every x epochs", default = 20)
-    parser.add_argument('-t', '--pretrained', type=bool, help="Load model with pretrained weights")
-    parser.add_argument('-w', '--warmup', type=bool, help="Use warming up scheduler for the first epoch (recommended when training on a new dataset)")
+# def parse_args():
+#     parser = argparse.ArgumentParser(description="Interference training settings")
+#     parser.add_argument('-d', '--dataset', type=str, help="Name of dataset located in /datasets directory")
+#     parser.add_argument('-m', '--model', type=str, choices=models, help="Select a model type", default=models[0])
+#     parser.add_argument('-e', '--epoch', type=int, help="Number of training epochs", default=50)
+#     parser.add_argument('-s', '--saved', type=str, help="Path to saved model to retrain on new dataset", default = None)
+#     parser.add_argument('-n', '--name', type=str, help="Name of experiment in comet", default = None)
+#     parser.add_argument('-b', '--batch', type=int, help="Size of img batch", default = 4)
+#     parser.add_argument('-r', '--rate', type=float, help="Learning rate", default = 0.001)
+#     parser.add_argument('--saveRate', type=int, help="Save every x epochs", default = 20)
+#     parser.add_argument('-t', '--pretrained', type=bool, help="Load model with pretrained weights")
+#     parser.add_argument('-w', '--warmup', type=bool, help="Use warming up scheduler for the first epoch (recommended when training on a new dataset)")
     
-    args = parser.parse_args()
-    return args
+#     args = parser.parse_args()
+#     return args
 
 class ParkDataset(Dataset):
     def __init__(self, dataframe, image_dir, transforms=None):

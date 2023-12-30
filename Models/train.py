@@ -1,4 +1,6 @@
 import comet_ml
+import inquirer
+from baselines.utils.queries import *
 from baselines.intersection_based.inter_models import *
 from baselines.utils.common_utils import seed_everything, get_device
 from baselines.utils.inter_utils import *
@@ -6,10 +8,8 @@ import pandas as pd
 import os
 import torch
 from torch.utils.data import DataLoader
-device = get_device()
 from comet_ml.integration.pytorch import log_model
 from datetime import datetime
-args = parse_args()
 
 try:
     with open("api.key") as f:
@@ -19,29 +19,32 @@ except:
 
 experiment = comet_ml.Experiment(
     api_key=key,
-    project_name="Parking_occupancy_SNP"
+    project_name="Parking_occupancy"
 )
 
-if args.name:
-    experiment.set_name(args.name)
+answers = inquirer.prompt(questions)
 
+experiment.set_name(answers["name"])
+
+
+device = get_device()
 #Settings
 min_size = 300
 max_size = 500
 mean = [0.485, 0.456, 0.406]
 std = [0.229, 0.224, 0.225]
-dataset = args.dataset
+dataset = answers["dataset"]
 
 settings = {
-    "batch_size" : args.batch,
-    "epochs" : args.epoch,
-    "learning_rate": args.rate,
-    "dataframe" : "datasets/"+str(dataset)+"/"+str(dataset)+"/"+str(dataset)+"_dataframe.csv",
-    "path" : "datasets/"+str(dataset)+'/'+str(dataset)+'/',
-    "model_type" : args.model,
+    "batch_size" : int(answers["batch"]),
+    "epochs" : int(answers["epoch"]),
+    "learning_rate": float(answers["rate"]),
+    "dataframe" : "datasets/"+dataset+"/"+dataset+"/"+dataset+"_dataframe.csv",
+    "path" : "datasets/"+dataset+'/'+dataset+'/',
+    "model_type" : answers["model"],
     "seed" : int(datetime.now().timestamp()),
-    "save_rate" : args.saveRate,
-    "pretrained" : args.pretrained
+    "save_rate" : int(answers["save_rate"]),
+    "pretrained" : answers["pretrained"]
 }
 experiment.log_parameters(settings)
 experiment.log_dataset_info(dataset, path = settings["path"])
@@ -50,31 +53,31 @@ seed_everything(settings["seed"])
 
 #Get wanted model from inter models, add custom models here too
 if settings["model_type"] == 'faster_rcnn_mobilenet':
-    model = get_model(faster_rcnn_mobilenet_params, args.pretrained)
+    model = get_model(faster_rcnn_mobilenet_params, answers["pretrained"])
 elif settings["model_type"] == 'faster_rcnn_mobilenetV3_Large':
-    model = get_model(faster_rcnn_mobilenetV3_Large_params, args.pretrained)
+    model = get_model(faster_rcnn_mobilenetV3_Large_params, answers["pretrained"])
 elif settings["model_type"] == 'faster_rcnn_mobilenetV3_Small':
-    model = get_model(faster_rcnn_mobilenetV3_Small_params, args.pretrained)
+    model = get_model(faster_rcnn_mobilenetV3_Small_params, answers["pretrained"])
 elif settings["model_type"] == 'faster_rcnn_resnet':
-    model = get_model(faster_rcnn_resnet_params, args.pretrained)
+    model = get_model(faster_rcnn_resnet_params, answers["pretrained"])
 elif settings["model_type"] == 'faster_rcnn_vgg':
-    model = get_model(faster_rcnn_vgg_params, args.pretrained)
+    model = get_model(faster_rcnn_vgg_params, answers["pretrained"])
 elif settings["model_type"] == 'retinanet_mobilenet':
-    model = get_model(retinanet_mobilenet_params, args.pretrained)
+    model = get_model(retinanet_mobilenet_params, answers["pretrained"])
 elif settings["model_type"] == 'retinanet_resnet':
-    model = get_model(retinanet_resnet_params, args.pretrained)
+    model = get_model(retinanet_resnet_params, answers["pretrained"])
 elif settings["model_type"] == 'retinanet_vgg':
-    model = get_model(retinanet_vgg_params, args.pretrained)
+    model = get_model(retinanet_vgg_params, answers["pretrained"])
 elif settings["model_type"] == 'retinanet_mobilenetV3_Large':
-    model = get_model(retinanet_mobilenetV3_Large_params)
+    model = get_model(retinanet_mobilenetV3_Large_params, answers["pretrained"])
 elif settings["model_type"] == 'retinanet_mobilenetV3_Small':
-    model = get_model(retinanet_mobilenetV3_Small_params)
+    model = get_model(retinanet_mobilenetV3_Small_params, answers["pretrained"])
 else:
     raise Exception('Invalid model type')
 
 #Loads exisint model for retraining
-if args.saved:
-    load_model(model, device, args.saved)
+if answers["retrain"]:
+    load_model(model, device, answers["saved"])
 
 model.to(device)
 
@@ -120,6 +123,6 @@ optimizer = torch.optim.Adam(params, lr=settings["learning_rate"], weight_decay=
 #lr_scheduler_increase = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=10.0)
 lr_scheduler_decrease = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
 
-train_inter_model(model, settings["epochs"], train_data_loader, valid_data_loader, device, experiment, settings, optimizer, scheduler=0, warmup=args.warmup)
+train_inter_model(model, settings["epochs"], train_data_loader, valid_data_loader, device, experiment, settings, optimizer, scheduler=0, warmup=answers["warmup"])
 #Save model to comet for inference
 log_model(experiment, model, model_name=settings["model_type"])
