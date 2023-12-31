@@ -1,7 +1,7 @@
 # Detection of parking space availability based on video
 This is a repo that contains the scripts for *''Detection of parking space availability based on video''* thesis and bachelor work.
 
-This repo originated as a fork of a repository from [*''Revising deep learning methods in parking lot occupancy detection''*](https://arxiv.org/abs/2306.04288). I greatly thank the authors for their work. And I recommend checking the repository along with their paperk, their reasearch helped me significantly.
+This repo originated as a fork of a repository from [*''Revising deep learning methods in parking lot occupancy detection''*](https://arxiv.org/abs/2306.04288). I greatly thank the authors for their work. And I recommend checking the repository along with their paper, their reasearch helped me significantly.
 
 The authors are:
 Anastasia Martynova, [Mikhail Kuznetsov](https://github.com/mmkuznecov), [Vadim Porvatov](https://www.researchgate.net/profile/Vadim-Porvatov), Vladislav Tishin, [Natalia Semenova](https://www.researchgate.net/profile/Natalia-Semenova-7).
