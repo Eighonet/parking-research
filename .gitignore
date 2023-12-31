@@ -261,3 +261,5 @@ annotators/widget_a/parking_photos
 api.key
 **/testing_result
 renamer.py
+**.JPG
+

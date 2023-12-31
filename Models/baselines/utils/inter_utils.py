@@ -431,9 +431,9 @@ def make_pred(model, device, img_batch, treshold):
     pred_class = pred_class[:over_treshold+1]
     return pred_boxes, pred_score
 
-def show_inference(img_batch, model, img, treshold):
+def show_inference(img_batch, model, img, device, treshold):
     tic = time.perf_counter()
-    boxes, score = make_pred(model, img_batch, treshold)
+    boxes, score = make_pred(model, device, img_batch, treshold)
     toc = time.perf_counter()
     for i, x in enumerate(boxes):
         cv2.rectangle(img, (int(x[0][0]),int(x[0][1])), (int(x[1][0]),int(x[1][1])), color=(255, 0, 0), thickness=2)
