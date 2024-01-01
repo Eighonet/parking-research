@@ -10,7 +10,6 @@ import torch
 from torch.utils.data import DataLoader
 from comet_ml.integration.pytorch import log_model
 from datetime import datetime
-os.chdir("Models")
 
 try:
     with open("api.key") as f:
