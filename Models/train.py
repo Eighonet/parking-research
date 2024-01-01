@@ -94,63 +94,61 @@ model.to(device)
 params = [p for p in model.parameters() if p.requires_grad]
     
 #Trains for multiple datasets
-#for i, dataset in enumerate(datasets):
-dataset = datasets[0]
-i = 0
-print("Training on", dataset)
-settings["dataframe"] = "datasets/"+dataset+"/"+dataset+"/"+dataset+"_dataframe.csv"
-settings["path"] = "datasets/"+dataset+'/'+dataset+'/'
-settings["epochs"] = int(epochs[i])
+for i, dataset in enumerate(datasets):
+    print("Training on", dataset)
+    settings["dataframe"] = "datasets/"+dataset+"/"+dataset+"/"+dataset+"_dataframe.csv"
+    settings["path"] = "datasets/"+dataset+'/'+dataset+'/'
+    settings["epochs"] = int(epochs[i])
 
-experiment = comet_ml.Experiment(
-api_key=api_key,
-project_name="Parking_occupancy"
-)
+    experiment = comet_ml.Experiment(
+    api_key=api_key,
+    project_name="Parking_occupancy"
+    )
 
-experiment.set_name(answers["name"]+"_"+dataset)
-experiment.log_parameters(settings)
-experiment.log_dataset_info(dataset, path = settings["path"])
+    experiment.set_name(answers["name"]+"_"+dataset)
+    experiment.log_parameters(settings)
+    experiment.log_dataset_info(dataset, path = settings["path"])
 
-DIR_INPUT = os.path.join(settings["path"], 'splitted_images/')
-DIR_TRAIN = f'{DIR_INPUT}/train'
-DIR_VAL = f'{DIR_INPUT}/val'
-DIR_TEST = f'{DIR_INPUT}/test'
+    DIR_INPUT = os.path.join(settings["path"], 'splitted_images/')
+    DIR_TRAIN = f'{DIR_INPUT}/train'
+    DIR_VAL = f'{DIR_INPUT}/val'
+    DIR_TEST = f'{DIR_INPUT}/test'
 
-dataframe = pd.read_csv(settings["dataframe"])
+    dataframe = pd.read_csv(settings["dataframe"])
 
-train_df, valid_df = get_dataframes(dataframe)
+    train_df, valid_df = get_dataframes(dataframe)
 
-# Dataset
-train_dataset = ParkDataset(train_df, DIR_TRAIN, get_train_transform())
-valid_dataset = ParkDataset(valid_df, DIR_VAL, get_valid_transform())
+    # Dataset
+    train_dataset = ParkDataset(train_df, DIR_TRAIN, get_train_transform())
+    valid_dataset = ParkDataset(valid_df, DIR_VAL, get_valid_transform())
 
-# Split the dataset in train and test set and create a data loader
-indices = torch.randperm(len(train_dataset)).tolist()
-train_data_loader = DataLoader(
-    train_dataset,
-    batch_size=settings["batch_size"],
-    shuffle=True,
-    num_workers=5,
-    collate_fn=collate_fn
-)
-valid_data_loader = DataLoader(
-    valid_dataset,
-    batch_size=settings["batch_size"],
-    shuffle=False,
-    num_workers=5,
-    collate_fn=collate_fn
-)
+    # Split the dataset in train and test set and create a data loader
+    indices = torch.randperm(len(train_dataset)).tolist()
+    train_data_loader = DataLoader(
+        train_dataset,
+        batch_size=settings["batch_size"],
+        shuffle=True,
+        num_workers=5,
+        collate_fn=collate_fn
+    )
+    valid_data_loader = DataLoader(
+        valid_dataset,
+        batch_size=settings["batch_size"],
+        shuffle=False,
+        num_workers=5,
+        collate_fn=collate_fn
+    )
 
-#Create an optimizer
-#SGD
-#optimizer = torch.optim.SGD(params, lr=settings["learning_rate"], momentum=0.9, weight_decay=0.0005)
-#Adam
-optimizer = torch.optim.Adam(params, lr=settings["learning_rate"], weight_decay=0.001)
+    #Create an optimizer
+    #SGD
+    #optimizer = torch.optim.SGD(params, lr=settings["learning_rate"], momentum=0.9, weight_decay=0.0005)
+    #Adam
+    optimizer = torch.optim.Adam(params, lr=settings["learning_rate"], weight_decay=0.001)
 
-#lr_scheduler_increase = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=10.0)
-lr_scheduler_decrease = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
-train_inter_model(model, settings["epochs"], train_data_loader, valid_data_loader, device, experiment, settings, optimizer, scheduler=0, warmup=answers["warmup"])
-experiment.end()
-    
-#Save model to comet for inference
-log_model(experiment, model, model_name=settings["model_type"])
+    #lr_scheduler_increase = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=10.0)
+    lr_scheduler_decrease = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
+    train_inter_model(model, settings["epochs"], train_data_loader, valid_data_loader, device, experiment, settings, optimizer, scheduler=0, warmup=answers["warmup"])
+    experiment.end()
+        
+    #Save model to comet for inference
+    log_model(experiment, model, model_name=settings["model_type"])
