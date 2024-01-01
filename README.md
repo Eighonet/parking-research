@@ -12,11 +12,17 @@ The original goal of this fork is to port the tools to newest python libraries a
 
 The training and testing scripts support only a object recognition models for now.
 
+Scripts will work with datasets used in Parking-Research
+
 ## What hase been added / changed
 - I written a training script that lets the user choose how to train a model with the dataset format from their work as both as a training script that uses the testing images from the dataset to test the trained model.
 - The creation of your own dataset was a bit simplified and reworked. Consult the readme located in [annotating](annotating/) directory.
 - All of the scripts should run both on CPU and GPU.
 - Tested on Python 3.11
+- Created a new dataset T10LOT (will be improved with more data)
+
+## Downloads
+[Images containing testing results with trained models and T10LOT dataset](https://drive.google.com/drive/folders/1Jvvc7PKZTQi63PJnOjMKW9x3qeNipSYl?usp=drive_link)
 
 # Prerequisites
 
