@@ -127,14 +127,14 @@ for i, dataset in enumerate(datasets):
         train_dataset,
         batch_size=settings["batch_size"],
         shuffle=True,
-        num_workers=5,
+        num_workers=4,
         collate_fn=collate_fn
     )
     valid_data_loader = DataLoader(
         valid_dataset,
         batch_size=settings["batch_size"],
         shuffle=False,
-        num_workers=5,
+        num_workers=4,
         collate_fn=collate_fn
     )
 
@@ -147,7 +147,9 @@ for i, dataset in enumerate(datasets):
     #lr_scheduler_increase = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=10.0)
     lr_scheduler_decrease = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
     train_inter_model(model, settings["epochs"], train_data_loader, valid_data_loader, device, experiment, settings, optimizer, scheduler=0, warmup=answers["warmup"])
-    experiment.end()
-        
+    
+    if not i == len(datasets):
+        experiment.end()
+
     #Save model to comet for inference
     log_model(experiment, model, model_name=settings["model_type"])
