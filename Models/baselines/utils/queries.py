@@ -39,16 +39,11 @@ questions = [
                  ignore = lambda x: x["retrain"] == False
                 ),
     
-    inquirer.Text('dataset',
-                  message="What dataset to use?"),
-    
-    inquirer.Text('epoch',
-                  message="Number of epochs to train for",
-                  default = 50,
-                  validate = check_int),
+    inquirer.Text('dataset_n',
+                  message="How many datasets do you want to use?", validate = check_int, default = 1),
     
     inquirer.Text('batch',
-                  message="Size of a batch",
+                  message="Size of a single batch",
                   default = 2,
                   validate = check_int),
     
